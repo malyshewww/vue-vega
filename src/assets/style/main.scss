@@ -1,0 +1,23 @@
+@import "components/_fonts.scss";
+@import "components/_system-styles.scss";
+
+@import "components/_variables.scss";
+@import "components/_mixin.scss";
+
+@import "components/_common.scss";
+@import "components/_btn.scss";
+@import "components/_content.scss";
+@import "components/_table.scss";
+@import "components/_form.scss";
+@import "components/_popup.scss";
+@import "components/_components.scss";
+
+
+@import "components/_header.scss";
+@import "pages/_main.scss";
+@import "components/_footer.scss";
+
+/* Внутренние */
+@import "components/_page.scss";
+@import "pages/_flat-item.scss";
+@import "pages/_flat-list.scss";

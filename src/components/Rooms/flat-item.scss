@@ -1,0 +1,442 @@
+.flat-item {
+  margin-top: 48px;
+  &__back {
+    position: relative;
+    padding-left: 28px;
+    svg {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      transition: left 0.3s;
+    }
+    span {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 125%;
+      letter-spacing: 0.16px;
+      color: $blue-medium;
+    }
+  }
+  &__body {
+    display: flex;
+    gap: 40px;
+    margin-top: 29px;
+    margin-bottom: 100px;
+  }
+  &__static-wrap {
+    width: 100%;
+    max-width: 947px;
+  }
+  &__sticky-wrap {
+    width: 453px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  &__plan {
+    width: 100%;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    .flat-wrapper-top {
+      position: relative;
+      padding: 72px 24px 0 72px;
+      width: 100%;
+      height: 582px;
+      ul {
+        width: 100%;
+        height: 100%;
+        li {
+          width: 100%;
+          height: 100%;
+          display: none;
+          a {
+            display: block;
+            width: calc(100% - 100px);
+            height: 100%;
+          }
+          picture {
+            display: flex;
+            width: 100%;
+            height: 100%;
+          }
+          img {
+            object-fit: contain;
+            object-position: center;
+            width: 100%;
+            height: 100%;
+          }
+          &.active {
+            display: block;
+          }
+        }
+      }
+    }
+    .flat-wrapper-bottom {
+      height: 88px;
+      width: 100%;
+      ul {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 28px;
+        margin-top: 25px;
+        li {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          span {
+            font-weight: 500;
+            letter-spacing: 0.14px;
+            color: $blue-medium;
+            transition: color 0.3s;
+            font-size: 14px;
+          }
+          svg {
+            path {
+              transition: fill 0.3s;
+            }
+          }
+          &.active {
+            span {
+              color: $blue-light;
+            }
+            svg {
+              path {
+                fill: $blue-light;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  &__first-street {
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: 400;
+    color: $beige-dark;
+  }
+  &__second-street {
+    position: absolute;
+    top: 56%;
+    left: 0;
+    transform: rotate(-90deg);
+    font-size: 14px;
+    font-weight: 400;
+    color: $beige-dark;
+  }
+  &__north {
+    position: absolute;
+    top: 32px;
+    right: 32px;
+  }
+  &__min-plan {
+    position: absolute;
+    bottom: 0;
+    right: 32px;
+  }
+  &__info {
+    width: 100%;
+    padding: 32px 40px 36px 40px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 40px 36px 40px;
+    height: fit-content;
+    position: sticky;
+    top: 138px;
+    right: 0;
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 9px;
+      font-family: $font;
+      sup {
+        font-size: 14px;
+      }
+    }
+    & > span {
+      font-size: 20px;
+      font-weight: 500;
+      color: $beige-dark;
+    }
+    & > button {
+      margin-top: 28px;
+      width: 100%;
+      background-color: $blue-medium;
+      &:hover {
+        background-color: #6a83b5;
+      }
+    }
+  }
+  &__floor-num {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid $beige-medium;
+    & > span {
+      font-size: 16px;
+      font-weight: 400;
+      color: $beige-dark;
+      &:last-child {
+        font-weight: 500;
+      }
+    }
+  }
+  &__params {
+    margin-top: 16px;
+    & > span {
+      font-size: 16px;
+      font-weight: 400;
+      color: $beige-dark;
+    }
+    ul {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      li {
+        display: flex;
+        padding: 5px 12px;
+        gap: 5px;
+        justify-content: center;
+        align-items: center;
+        font-weight: 500;
+        font-size: 14px;
+        color: #ffffff;
+        border-radius: 4px;
+        &.log {
+          background-color: $violet;
+        }
+        &.bal {
+          background-color: $orange;
+        }
+      }
+    }
+  }
+  &__text {
+    margin-top: 100px;
+    h2 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.37em;
+      color: $beige-dark;
+      margin-bottom: 8px;
+    }
+  }
+  &__slider {
+    margin-top: 48px;
+    width: 100%;
+    height: 600px;
+    .swiper-slide {
+      width: 100%;
+      height: 100%;
+      picture {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+    .swiper__control {
+      display: flex;
+      width: fit-content;
+      height: fit-content;
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      gap: 8px;
+      z-index: 2;
+    }
+  }
+  &__prev,
+  &__next {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    svg {
+      transition: opacity 0.3s;
+      opacity: 0.6;
+    }
+    &.swiper-button-disabled {
+      opacity: 0.6;
+      svg {
+        opacity: 0.6;
+      }
+    }
+    @media (min-width: 1000px) {
+      &:not(.swiper-button-disabled):hover {
+        svg {
+          opacity: 1;
+        }
+      }
+    }
+  }
+  &__prev {
+    transform: rotate(180deg);
+  }
+}
+
+@media (min-width: 1000px) {
+  .flat-item {
+    &__back {
+      &:hover {
+        svg {
+          left: -10px;
+        }
+      }
+    }
+    &__plan {
+      .flat-wrapper-bottom {
+        ul li {
+          &:hover {
+            span {
+              color: $blue-light;
+            }
+            svg {
+              path {
+                fill: $blue-light;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1600px) {
+  .flat-item {
+    &__static-wrap {
+      max-width: 700px;
+    }
+    &__slider {
+      height: 449px;
+    }
+  }
+}
+
+@media (max-width: 1365px) {
+  .flat-item {
+    &__body {
+      flex-direction: column-reverse;
+    }
+    &__sticky-wrap {
+      width: 100%;
+    }
+    &__info {
+      position: relative;
+      top: 0;
+      & > button {
+        width: fit-content;
+      }
+    }
+    &__static-wrap {
+      max-width: 100%;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .flat-item {
+    &__plan {
+      .flat-wrapper-top {
+        padding: 20px;
+        height: 350px;
+      }
+    }
+    &__first-street {
+      top: 7px;
+    }
+    &__second-street {
+      left: -17px;
+    }
+    &__min-plan {
+      display: none;
+    }
+    &__text {
+      margin-top: 60px;
+    }
+    &__body {
+      margin-bottom: 60px;
+    }
+    &__slider {
+      .swiper__control {
+        bottom: 10px;
+        right: 10px;
+      }
+    }
+  }
+  .flat-item__plan .flat-wrapper-top ul li a {
+    width: 100%;
+    padding-top: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .flat-item {
+    &__body {
+      gap: 20px;
+    }
+    &__info {
+      padding: 20px;
+      h1 {
+        font-size: 26px;
+      }
+      & > span {
+        font-size: 16px;
+        font-size: 0;
+      }
+      & > button {
+        width: 100%;
+        margin-top: 15px;
+      }
+    }
+    &__text {
+      h2 {
+        font-size: 26px;
+      }
+      p {
+        font-size: 15px;
+      }
+    }
+    &__slider {
+      height: 300px;
+      margin-top: 30px;
+    }
+    &__back {
+      svg {
+        top: 0px;
+      }
+    }
+  }
+
+  .flat-item__north {
+    right: 5px;
+    top: 5px;
+    width: 50px;
+  }
+}

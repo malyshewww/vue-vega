@@ -1,0 +1,564 @@
+// стили шапки и меню
+.header{
+    position: fixed;
+    top: 0;
+    z-index: 5;
+    height: $headerHeight;
+    width: 100%;
+    // background: linear-gradient(180deg, rgba(37, 55, 80, 0.5) 0%, rgba(37, 55, 80, 0) 80%);
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    transform: translateY(0%);
+
+    transition: background-color 1s, transform $time;
+    // закрепленное меню десктоп
+    &.fixed{
+        background: $blue-dark;
+
+        .header__order-call{
+            background-color: $blue-light;
+            &:hover{
+                background-color: $blue-light-hover;
+            }
+
+        }
+        .header__menu{
+            background-color: transparent;
+            transform: translateX(-80px);
+            @media (max-width: 1899px) {
+                transform: translateX(-50px);
+            }
+        }
+        .header__menu-burger{
+            opacity: 0;
+        }
+    }
+    // закрепленное меню при адаптиве
+    &.fixed-adaptive{
+        background: $blue-dark;
+        .header__order-call{
+            background-color: $blue-light;
+            &:hover{
+                background-color: $blue-light-hover;
+            }
+        }
+        .header__logo{
+            .light{
+                opacity: 0;
+            }
+            .medium{
+                opacity: 1;
+            }
+        }
+    }
+    // открытое меню при адаптиве
+    &.open{
+        background-color: #FFFFFF;
+        .header__menu-nav {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1s;
+        }
+        .header__logo{
+            .light{
+                opacity: 0;
+            }
+            .dark{
+                opacity: 1;
+            }
+        }
+    }
+    // спрятан
+    &.hidden{
+        transform: translateY(-100%);
+    }
+    body.not-front &{
+        background-color: #fff;
+        .header__logo{
+            // margin-right: auto;
+            .light{
+                opacity: 0;
+            }
+            .dark{
+                opacity: 1;
+            }
+        }
+        .header__menu{
+            // display: none;
+            background-color: rgba(250, 250, 250, 1);
+            @media (max-width: 1599px) {
+                background-color: transparent;
+            }
+            &-title{
+                color: $black;
+            }
+            &-nav li a {
+                color: $black;
+            }
+        }
+        .header__phone {
+            color: $black;
+            &::before {
+                content: url(../img/icons/phone-black.svg);
+            }
+        }
+        &.fixed{
+            .header__menu{
+                background-color: transparent;
+            }
+        }
+        .header__order-call {
+            background-color: #7EB1E3;
+            &:hover {
+                background-color: #84BFFA;
+            }
+        }
+    }
+    @media (max-width: 639px) {
+        height: $headerHeightPhone;
+    }
+    &__container{
+        width: 100%;
+        padding: 0 80px;
+        display: flex;
+        align-items: center;
+        @media (max-width: 1899px) {
+            padding: 0 30px;
+        }
+        @media (max-width: 767px) {
+            padding: 0 15px;
+        }
+    }
+    &__logo{
+        margin-right: 70px;
+        position: relative;
+        height: 50px;
+        aspect-ratio: 2.38;
+        .light{
+            height: 100%;
+            width: 100%;
+            transition: opacity $time;
+            opacity: 1;
+        }
+        .dark,
+        .medium{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity $time;
+            opacity: 0;
+            img{
+                width: 100%;
+                height: 100%;
+            }
+        }
+        @media (max-width: 1899px) {
+            height: 50px;
+            margin-right: 30px;
+        }
+        @media (max-width: 639px) {
+            height: 36px;
+            width: 88px;
+        }
+    }
+    &__phone{
+        margin-left: auto;
+        margin-right: 40px;
+        font-weight: 500;
+        font-size: 18px;
+        color: #FFFFFF;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        &::before{
+            content: '';
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            mask-image: url(../img/icons/phone.svg);
+            mask-position: center;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            background-color: #fff;
+            opacity: 0.5;
+            transition: opacity $time, background-color $time;
+        }
+        &:hover::before{
+            opacity: 1;
+        }
+        body.not-front &{
+            &::before{
+                mask-image: none;
+                background-image: url(../img/icons/phone-not-front.svg);
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: contain;
+            }
+        }
+
+        @media (max-width: 1140px) {
+            font-size: 0;
+            gap: 0;
+            margin-right: 30px;
+            height: 52px;
+            width: 52px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255, 0.25);
+            border: 1px solid transparent;
+            transition: border-color $time;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &::before{
+                height: 20px;
+                opacity: 1;
+                width: 30px;
+            }
+            &:hover::before{
+                background-color: $blue-medium;
+            }
+            body.not-front &,
+            .header.open &{
+                border-color: $blue-lightest;
+                &::before{
+                    background-color: $blue-dark;
+                    mask-image: url(../img/icons/phone.svg);
+                }
+                &:hover::before{
+                    background-color: $blue-light;
+                }
+            }
+            .header.fixed-adaptive &{
+                &:hover::before{
+                    background-color: $blue-light;
+                }
+            }
+        }
+        @media (max-width: 1023px) {
+            margin-left: 0;
+        }
+        @media (max-width: 639px) {
+            margin-right: 0;
+            width: 36px;
+            height: 36px;
+            &::before{
+                width: 16px;
+                height: 16px;
+            }
+            &:hover::before{
+                background-color: white;
+            }
+            .header.fixed-adaptive &{
+                &:hover::before{
+                    background-color: white;
+                }
+            }
+            .header.open &{
+                &:hover::before{
+                    background-color: $blue-dark;
+                }
+            }
+        }
+    }
+    &__order-call{
+        @media (max-width: 639px) {
+            display: none;
+        }
+    }
+    &__menu{
+        height: 52px;
+        padding: 0px 30px;
+        background-color: rgba(255,255,255, 0.25);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        transition: width $time 0.3s, transform $time;
+        width: 150px;
+        margin-right: auto;
+        cursor: pointer;
+        // display: none;
+        &.open{
+            transition: width $time 0s, transform $time;
+            cursor: initial;
+        }
+        @media (max-width: 1599px) {
+            background: none;
+            gap: 0;
+            padding: 0;
+            width: fit-content;
+        }
+        @media (max-width: 1023px) {
+            margin-right: 20px;
+            margin-left: auto;
+        }
+        @media (max-width: 639px) {
+            margin-right: 15px;
+        }
+        &-burger{
+            cursor: pointer;
+            .header__menu:hover & .burger span{
+                width: 100%;
+                @media (max-width: 767px) {
+                    width: 60%;
+                }
+            }
+            .burger{
+                width: 17px;
+                height: 14px;
+                position: relative;
+                cursor: pointer;
+                transition: opacity $time;
+                span,
+                &::before,
+                &::after{
+                    display: block;
+                    position: absolute;
+                    width: 100%;
+                    height: 2px;
+                    background-color: white;
+                }
+                span{
+                    width: 60%;
+                    top: calc(50% - 1px);
+                    opacity: 1;
+                    transition: opacity $time 0.3s, background-color $time 0s, width $time;
+                }
+                &::before{
+                    content: '';
+                    top: 0;
+                    transition: transform $time 0s, background-color $time 0s;
+                    transform-origin: left;
+                }
+                &::after{
+                    content: '';
+                    bottom: 0%;
+                    transition: transform $time 0s, background-color $time 0s;
+                    transform-origin: left;
+                }
+                
+                .header__menu.open &{
+                    span{
+                        opacity: 0;
+                        transition: opacity $time 0s, background-color $time 0s;
+                    }
+                    &::after{
+                        transform: rotate(-45deg);
+                        transition: transform $time 0.3s, background-color $time 0s;
+                    }
+                    &::before{
+                        transform: rotate(45deg);
+                        transition: transform $time 0.3s, background-color $time 0s;
+                    }
+                }
+                body.not-front &{
+                    span,
+                    &::before,
+                    &::after{
+                        background-color: $black;
+                    }
+                }
+            }
+            @media (max-width: 1599px) {
+                height: 52px;
+                width: 52px;
+                border-radius: 50%;
+                background-color: rgba(255,255,255, 0.25);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid transparent;
+                transition: border-color $time;
+                .header.open &{
+                    border-color: $blue-lightest;
+                    &:hover .burger span,
+                    &:hover .burger::after,
+                    &:hover .burger::before{
+                        background-color: $blue-light;
+                    }
+                    .burger{
+                        span{
+                            background-color: $blue-dark;
+                            opacity: 0;
+                            transition: opacity $time 0s, background-color $time 0s;
+                        }
+                        &::after{
+                            width: calc(100% + 4px);
+                            background-color: $blue-dark;
+                            transform: rotate(-45deg) translateY(2px);
+                            transition: width $time 0.3s, transform $time 0.3s, background-color $time 0s;
+                        }
+                        &::before{
+                            width: calc(100% + 4px);
+                            background-color: $blue-dark;
+                            transform: rotate(45deg) translateY(-2px);
+                            transition: width $time 0.3s, transform $time 0.3s, background-color $time 0s;
+                        }
+
+                    }
+                }
+                .header.fixed-adaptive &{
+                    &:hover .burger span,
+                    &:hover .burger::after,
+                    &:hover .burger::before{
+                        background-color: $blue-light;
+                    }
+                }
+                body.not-front &{
+                    border-radius: 50%;
+                    border: 1px solid $blue-lightest;
+                    & .burger{
+                        span,
+                        &::before,
+                        &::after{
+                            background-color: $blue-dark;
+                        }
+                    }
+                } 
+            }
+            @media (max-width: 639px) {
+                height: 36px;
+                width: 36px;
+                .burger{
+                    width: 14px;
+                    height: 12px;
+                }
+                .header.fixed-adaptive &{
+                    &:hover .burger span,
+                    &:hover .burger::after,
+                    &:hover .burger::before{
+                        background-color: white;
+                    }
+                }
+                .header.open &{
+                    border-color: $blue-lightest;
+                    &:hover .burger span,
+                    &:hover .burger::after,
+                    &:hover .burger::before{
+                        background-color: $blue-dark;
+                    }
+                }
+
+            }
+
+        }
+        &-content{
+            position: relative;
+            width: fit-content;
+
+            @media (max-width: 1599px) {
+                position: static;
+            }
+        }
+        &-title{
+            font-weight: 500;
+            font-size: 16px;
+            letter-spacing: 0.01em;
+            color: #FFFFFF;
+            position: absolute;
+            top: 50%;
+            left: -10px;
+            transform: translateY(-50%);
+            transition: opacity $time;
+            opacity: 1;
+            .header__menu.open &{
+                opacity: 0;
+            }
+            @media (max-width: 1599px) {
+                display: none;
+            }
+        }
+        &-nav{
+            position: absolute;
+            top: 50%;
+            left: -10px;
+            transform: translateY(-50%);
+            opacity: 0;
+            visibility: hidden;
+            transition: all $time 0s;
+            ul{
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            li{
+                a{
+                    white-space: nowrap;
+                    cursor: pointer;
+                    font-weight: 500;
+                    font-size: 16px;
+                    letter-spacing: 0.01em;
+                    color: #FFFFFF;
+                    opacity: 0.6;
+                    transition: opacity $time;
+                    &:hover{
+                        opacity: 1;
+                    }
+                    &.active{
+                        opacity: 1;
+                    }
+                }
+
+            }
+            .header__menu.open &{
+                opacity: 1;
+                visibility: visible;
+                transition: all $time 0.3s;
+            }
+            @media (max-width: 1599px) {
+                background-color: $beige-light;
+                color: $black;
+                width: 100%;
+                top: calc(100% - 1px);
+                left: 0;
+                height: auto;
+                padding: 50px;
+                transform: translate(0);
+                ul{
+                    flex-wrap: wrap;
+                    gap: 15px 20px;
+                }
+                li a{
+                    color: $black;
+                }
+            }
+            @media (max-width: 767px) {
+                padding: 30px 15px;
+            }
+            @media (max-width: 639px) {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(100%);
+                // top: -100vh;
+                height: calc(100vh - $headerHeightPhone);
+                // transition: transform 1s, top 1s;
+                // opacity: 0;
+                transition: transform 1s, opacity 1s, top 1s, visibility 1s;
+                visibility: hidden;
+                ul{
+                    flex-direction: column;
+                    align-items: start;
+                    grid-gap: 20px;
+                }
+                .header.open &{
+                    // opacity: 1;
+                    visibility: visible;
+                    transform: translateX(0);
+                    // top: $headerHeightPhone;
+                    transition: transform 1s, opacity 1s, top 1s;
+                }
+            }
+        }
+    }
+}
+body.user-logged-in .header{
+    top: 79px;
+}
+
+

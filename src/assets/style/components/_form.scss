@@ -1,0 +1,237 @@
+// стили формы
+form{
+	div[role="alert"]{
+		display: none;
+	}
+	// Обертка поля .form-item
+	.form-item--error{
+		input{
+			border-bottom: 1px solid $alert;
+		}
+		.form-item--error-message{
+			font-size: 12px;
+			color: $alert;
+			margin-bottom: 15px;
+			margin-top: 2px;
+		}
+	}
+}
+
+// form div[role="alert"]{
+// 	display: none;
+// }
+// form .form-item--error input{
+// 	border-color: #FC5D67;
+// }
+// form .form-item--error .form-item--error-message{
+// 	font-size: 12px;
+// 	color: #FC5D67;
+// 	margin-top: -12px;
+// 	margin-bottom: 15px;
+// }
+
+input::-ms-clear,
+input::-ms-reveal{
+   display: none;
+}
+input::-webkit-search-decoration,
+input::-webkit-search-cancel-button,
+input::-webkit-search-results-button,
+input::-webkit-search-results-decoration{
+   display: none;
+}
+input, textarea, select {
+    -webkit-appearance: none;
+}
+.form{
+	&__field{
+		width: 100%;
+		height: 54px;
+		font-family: $font;
+		font-weight: 400;
+		font-size: 16px;
+		border: 1px solid transparent;
+		border-bottom: 1px solid $beige;
+		outline: none;
+		border-radius: 0;
+		padding: 0 8px;
+		color: $dark-text;
+		transition: all $time;
+		@media (max-width: 411px) {
+			height: 43px;
+			font-size: 14px;
+		}
+		&::-webkit-input-placeholder{
+			font-family: $font;
+			font-weight: 400;
+			font-size: 16px;
+			color: $beige-dark;
+			opacity: 1;
+			transition: opacity 0.3s;
+			@media (max-width: 411px) {
+				font-size: 14px;
+			}
+		}
+		&::-moz-placeholder{
+			font-family: $font;
+			font-weight: 400;
+			font-size: 16px;
+			color: $beige-dark;
+			opacity: 1;
+			transition: opacity 0.3s;
+			@media (max-width: 411px) {
+				font-size: 14px;
+			}
+		}
+		&:focus::-moz-placeholder{
+			opacity: 0 !important;
+		}
+		&:focus::-webkit-input-placeholder{
+			opacity: 0 !important;
+		}
+		&:hover{
+			border-bottom: 1px solid $blue-light;
+		}
+		&:focus{
+			border-bottom: 1px solid $blue-light;
+		}
+		// &:focus{
+		// 	border-radius: 4px;
+		// 	border-color: $blue-light;
+		// 	box-shadow: 0px 0px 8px $blue-light;
+		// }
+	}
+	&__button{
+		margin: auto;
+	}
+}
+fieldset{
+	border: none;
+	padding: 0;
+	margin: 0;
+	legend{
+		font-size: 14px;
+		color: $beige-dark;
+		margin-bottom: 12px;
+	}
+}
+.noUi-horizontal{
+	height: 1px;
+	border: none;
+}
+.noUi-connects{
+	background-color: $beige;
+	border: none;
+}
+.noUi-connect{
+	background-color: $blue-medium;
+	border: none;
+}
+.noUi-handle.noUi-handle-lower,
+.noUi-handle.noUi-handle-upper{
+	cursor: pointer;
+	background-color: $blue-medium;
+	box-shadow: none;
+	border-radius: 50%;
+	border: none;
+	width: 11px;
+	height: 11px;
+	transform: translateX(-8px);
+	&::after,&::before{
+		display: none;
+	}
+}
+input[type="checkbox"],
+input[type="radio"]{
+	display: none;
+	& ~ label{
+		position: relative;
+		cursor: pointer;
+		font-weight: 500;
+		font-size: 16px;
+		display: flex;
+		// align-items: center;
+		gap: 12px;
+		transition: color $time;
+		&::before{
+			box-sizing: border-box;
+			content: '';
+			display: inline-block;
+			min-width: 20px;
+			height: 20px;
+			border-radius: 2px;
+			border: 1px solid #A4A0A2;
+			transition: border-color $time, background-color $time;
+			@media (max-width: 411px) {
+				min-width: 16px;
+				height: 16px;
+			}
+		}
+		&:hover{
+			color: $blue-dark;
+			&::before{
+				border-color: $blue-light;
+			}
+		}
+		&:focus{
+			&::before{
+				border-color: $blue-light;
+				box-shadow: 0px 0px 8px $blue-light;
+			}
+		}
+		&::after{
+			position: absolute;
+			left: 6px;
+			top: 5px;
+			content: "";
+			display: block;
+			width: 8px;
+			height: 4px;
+			border-bottom: 1px solid white;
+			border-left: 1px solid white;
+			transform: rotate(-45deg) scale(1.2);
+			opacity: 0;
+			transition: opacity 0.5s;
+			@media (max-width: 411px) {
+				width: 6px;
+				height: 3px;
+				top: 4px;
+				left: 4px;
+			}
+		}
+	}
+	&:checked ~ label{
+		&::before{
+			border-color: $blue-medium;
+			background-color: $blue-medium;
+		}
+		&::after{
+			opacity: 1;
+		}
+	}
+}
+.agreement{
+	margin-top: 20px;
+	margin-bottom: 40px;
+	input  ~ label{
+		font-weight: 400;
+		font-size: 16px;
+		color: $beige-dark;
+		a{
+			color: $blue-medium;
+			&:hover{
+				color: $blue-medium-hover;
+			}
+		}
+	}
+
+	@media (max-width: 411px) {
+		margin-bottom: 24px;
+		input ~ label{
+			font-size: 12px;
+			a{
+				white-space: nowrap;
+			}
+		}
+	}
+}

@@ -1,0 +1,196 @@
+// общие стили и контейнер
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    font-family: $font;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    color: $black;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    @media (max-width: 639px) {
+        font-size: 16px;
+    }
+    @media (max-width: 479px) {
+        font-size: 14px;
+    }
+}
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f6f4f5;
+}
+.footer {
+    margin-top: auto;
+}
+ul,
+ol {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin-top: 0;
+}
+h3 {
+    font-size: 32px;
+    @media (max-width: 1259px) {
+        font-size: 28px;
+    }
+    @media (max-width: 639px) {
+        font-size: 24px;
+    }
+    @media (max-width: 479px) {
+        font-size: 20px;
+    }
+    @media (max-width: 411px) {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+}
+h1,
+h2,
+h3 {
+    font-family: $font-heading;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all $time;
+}
+img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+}
+
+body.front {
+    background-color: $beige-light;
+}
+body.not-front {
+    padding-top: $headerHeight;
+    background-color: $beige-light;
+    @media (max-width: 639px) {
+        padding-top: $headerHeightPhone;
+    }
+}
+body.not-scroll {
+    overflow: hidden;
+}
+.container {
+    max-width: 1600px;
+    width: 100%;
+    padding: 0 calc((1600px - $containerWidth) / 2);
+    margin: 0 auto;
+    position: relative;
+    @media (max-width: 1259px) {
+        padding: 0 50px;
+    }
+    @media (max-width: 767px) {
+        padding: 0 15px;
+    }
+}
+
+* {
+    scrollbar-width: thin;
+}
+*::-webkit-scrollbar {
+    width: 5px; /* ширина для вертикального скролла */
+    height: 5px; /* высота для горизонтального скролла */
+    background-color: #ffffff;
+}
+*::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    background-color: #8e8e8e;
+    border-radius: 5px;
+    -webkit-box-shadow: inset 1px 1px 10px #f3faf7;
+    box-shadow: inset 1px 1px 10px #f3faf7;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #3e3e3e;
+}
+
+[class*="ground-pane"] {
+    filter: grayscale(1);
+}
+.placemark_layout_container {
+    width: 32px;
+    height: 32px;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+
+    &::before {
+        position: absolute;
+        top: 0;
+        content: "";
+        display: block;
+        background-color: $blue-medium;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        transition: background-color $time;
+    }
+    &::after {
+        content: "";
+        display: block;
+        width: 24px;
+        height: 24px;
+        mask-image: url(../img/icons/place.svg);
+        mask-repeat: no-repeat;
+        mask-size: cover;
+        background-color: #fff;
+    }
+    .placemark_layout_text {
+        position: absolute;
+        left: calc(100% - 20px);
+        background-color: #fff;
+        border-radius: 4px;
+        width: 190px;
+        padding: 8px 8px 8px 24px;
+        font-size: 13px;
+        z-index: -1;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        opacity: 0;
+        transition: opacity $time;
+    }
+}
+.placemark_layout_container.active {
+    z-index: 5;
+    &::before {
+        background-color: $blue-dark;
+    }
+    .placemark_layout_text {
+        opacity: 1;
+    }
+}
+
+.swiper-pagination-bullet {
+    background-color: $blue-medium;
+    &.swiper-pagination-bullet-active {
+        background-color: $blue-medium;
+    }
+    @media (max-width: 411px) {
+        width: 4px;
+        height: 4px;
+    }
+}

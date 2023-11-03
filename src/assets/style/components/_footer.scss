@@ -1,0 +1,221 @@
+// Стили подвала
+.footer{
+    position: relative;
+    @media (max-width: 959px) {
+        font-size: 16px;
+    }
+    @media (max-width: 639px) {
+        padding-bottom: 36px;
+    }
+    &__top{
+        border-top: 1px solid $beige;
+        padding-top: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        gap: 20px 30px;
+        flex-wrap: wrap;
+        @media (max-width: 1365px) {
+            margin-bottom: 50px;
+        }
+        @media (max-width: 479px) {
+            padding-top: 80px;
+            margin-bottom: 30px;
+        }
+    }
+    &__nav{
+        ul{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px 30px;
+            @media (max-width: 479px) {
+                // display: grid;
+                // grid-template-columns: 1fr 1fr;
+                // gap: 15px;
+                column-count: 2;
+                display: block;
+                column-gap: 10px;
+                margin-bottom: -15px;
+            }
+            @media (max-width: 479px) {
+                // gap: 10px;
+            }
+            li{
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 16px;
+                letter-spacing: 0.01em;
+                opacity: 1;
+                transition: opacity $time;
+                white-space: nowrap;
+                @media (max-width: 479px) {
+                    white-space: initial;
+                    font-size: 14px;
+                    margin-bottom: 15px;
+                }
+            }
+            &:hover{
+                li{
+                    opacity: 0.6;
+                    &:hover{
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+    }
+    &__phone{
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        font-weight: 500;
+        font-size: 16px;
+        letter-spacing: 0.01em;
+        &::before{
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: $beige-medium;
+            transition: background-color $time;
+        }
+        &::after{
+            content: '';
+            display: block;
+            width: 11px;
+            height: 11px;
+            mask-image: url(../img/icons/phone.svg);
+            mask-size: contain;
+            background-color: $black;
+            position: absolute;
+            top: 50%;
+            left: 7px;
+            transform: translateY(-50%);
+        }
+        &:hover::before{
+            background-color: $beige;
+        }
+        @media (max-width: 479px) {
+            position: absolute;
+            top: 16px;
+            right: 15px;
+        }
+    }
+    &__medium{
+        display: flex;
+        gap: 30px;
+        margin-bottom: 60px;
+        font-size: 14px;
+        @media (max-width: 1023px) {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+        }
+        @media (max-width: 479px) {
+            display: block;
+            grid-template-columns: 120px 1fr;
+            margin-bottom: 30px;
+            position: static;
+        }
+    }
+    &__logo{
+        min-width: 80px;
+        width: 80px;
+        @media (max-width: 479px) {
+            position: absolute;
+            top: 16px;
+            left: 15px;
+        }
+    }
+    &__description{
+        line-height: 1.5;
+        max-width: 700px;
+        color: $beige-dark;
+        @media (max-width: 1023px) {
+            text-align: end;
+            max-width: initial;
+        }
+        @media (max-width: 479px) {
+            text-align: initial;   
+            font-size: 12px;
+        }
+    }
+    &__info{
+        margin-left: auto;
+        line-height: 1.5;
+        @media (max-width: 1023px) {
+            grid-column: span 2;
+        }
+        @media (max-width: 479px) {
+           margin-left: initial;  
+           font-size: 12px;
+        }
+    }
+    &__copyright{
+        margin-bottom: 5px;
+    }
+    &__schedule,
+    &__address,
+    &__copyright{
+        width: fit-content;
+        white-space: nowrap;
+        text-align: end;
+        color: $beige-dark;
+        font-style: initial;
+        margin-left: auto;
+        @media (max-width: 479px) {
+            margin-left: initial;  
+            font-size: 12px;
+        }
+    }
+    &__bottom{
+        display: flex;
+        align-items: center;
+        padding-bottom: 30px;
+        font-size: 14px;
+        @media (max-width: 767px) {
+            flex-wrap: wrap;
+            gap: 15px 30px;
+        }
+        @media (max-width: 479px) {
+            gap: 10px;
+            font-size: 12px;
+        }
+        &-link{
+            color: $blue-medium;
+            margin-right: 40px;
+            position: relative;
+            &::after{
+                content: '';
+                display: block;
+                width: 0%;
+                height: 1px;
+                background-color: $blue-medium;
+                position: absolute;
+                top: 105%;
+                left: 0;
+                transition: width $time;
+            }
+            &:hover::after{
+                width: 100%;
+            }
+        }
+    }
+    &__webshop{
+        cursor: pointer;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: $beige-dark;
+        @media (max-width: 767px) {
+            margin-left: initial;
+        }
+    }
+
+}
