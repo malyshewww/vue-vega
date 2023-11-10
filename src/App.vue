@@ -3,24 +3,34 @@ import noUiSlider from "nouislider";
 import axios from "axios";
 import json from "./data.json";
 import FlatItem from "./components/Rooms/FlatItem.vue";
-// import FlatWindow from "./components/Rooms/FlatWindow.vue";
-// import VueNouislider from "vue3-nouislider";
+import FlatWindow from "./components/Rooms/FlatWindow.vue";
 import { ref, onMounted, onUnmounted } from "vue";
 export default {
     components: {
-        // Flat,
-        // VueNouislider,
         noUiSlider,
         FlatItem,
-        // FlatWindow,
     },
+    // provide() {
+    //     return {
+    //         todoLength: this.$refs.length,
+    //     };
+    // },
     data() {
         return {
+            provide: {
+                user: "John Doe",
+            },
+            errors: [],
+            res: [],
+            isActive: false,
             allDone: false,
             xPos: "",
             yPos: "",
             info: json,
+            arrPrices: [],
+            arrSquare: [],
             newListRoom: [],
+            updateListRoom: [],
             selectedRooms: [],
             floorNumber: [
                 "1",
@@ -73,11 +83,11 @@ export default {
             area: {
                 minRange: null,
                 maxRange: null,
-                startMin: 34.5,
-                startMax: 68,
+                startMin: 35.95,
+                startMax: 72.35,
                 step: 0.1,
-                min: 34.5,
-                max: 68,
+                min: 35.95,
+                max: 72.35,
             },
             floor: {
                 minRange: null,
@@ -89,9 +99,16 @@ export default {
                 max: 15,
             },
             flatWindow: document.querySelector(".flat-list__window"),
+            filtered_rooms: [],
         };
     },
     methods: {
+        openFilter() {
+            this.isActive = true;
+        },
+        closeFilter() {
+            this.isActive = false;
+        },
         updateSlider() {
             this.$refs.slider_room.noUiSlider.on(
                 "update",
@@ -121,13 +138,74 @@ export default {
                     }
                 }
             );
+            // this.$refs.slider_room.noUiSlider.on("change", (e) => {
+            //     console.log("change");
+            // });
+        },
+        updateMinPrice(arr) {
+            this.slider.minRange = arr.length
+                ? Math.min(...arr)
+                : this.slider.startMin;
+        },
+        updateMaxPrice(arr) {
+            this.slider.maxRange = arr.length
+                ? Math.max(...arr)
+                : this.slider.startMax;
+        },
+        updateMinSquare(arr) {
+            this.area.minRange = arr.length
+                ? Math.min(...arr)
+                : this.area.startMin;
+        },
+        updateMaxSquare(arr) {
+            this.area.maxRange = arr.length
+                ? Math.max(...arr)
+                : this.area.startMax;
+        },
+        setNewSliderValues() {
+            this.$refs.slider_room.noUiSlider.set([
+                this.slider.minRange,
+                this.slider.maxRange,
+            ]);
+            this.$refs.slider_area.noUiSlider.set([
+                this.area.minRange,
+                this.area.maxRange,
+            ]);
         },
         updateScheme(e) {
-            // console.log(e.target.value);
-            console.log("change");
-            this.$refs.slider_room.noUiSlider.on("change", (e) => {
-                console.log("change");
+            console.log(e.target.value);
+            this.newListRoom.map((item) => {
+                this.filtered_rooms = item.filter((f, i) => {
+                    if (e.target.value == f.field_euro) {
+                        if (e.target.checked) {
+                            this.updateListRoom.push(f);
+                            this.arrPrices.push(f.field_price);
+                            this.arrSquare.push(Number(f.field_square));
+
+                            this.updateMinPrice(this.arrPrices);
+                            this.updateMaxPrice(this.arrPrices);
+                            this.updateMinSquare(this.arrSquare);
+                            this.updateMaxSquare(this.arrSquare);
+                            this.setNewSliderValues();
+                        } else {
+                            this.updateListRoom.splice(
+                                this.updateListRoom.indexOf(i),
+                                1
+                            );
+                            this.arrPrices.splice(this.arrPrices.indexOf(i), 1);
+                            this.arrSquare.splice(this.arrSquare.indexOf(i), 1);
+
+                            this.updateMinPrice(this.arrPrices);
+                            this.updateMaxPrice(this.arrPrices);
+                            this.updateMinSquare(this.arrSquare);
+                            this.updateMaxSquare(this.arrSquare);
+
+                            this.setNewSliderValues();
+                        }
+                    }
+                });
             });
+            console.log(this.arrSquare);
         },
         getPartArray() {
             let size = 9; // размер подмассива
@@ -137,38 +215,67 @@ export default {
                     i * size + size
                 );
             }
+            this.newListRoom.forEach((item, i) => {
+                item.map((elem) => {
+                    elem.field_price = elem.field_price
+                        .replace("руб.", "")
+                        .trim();
+                    if (
+                        elem.field_rooms_count == "1" &&
+                        elem.field_euro == "Да"
+                    ) {
+                        elem.field_euro = "1+";
+                    } else if (
+                        elem.field_rooms_count == "2" &&
+                        elem.field_euro == "Да"
+                    ) {
+                        elem.field_euro = "2+";
+                    } else if (
+                        elem.field_rooms_count == "3" &&
+                        elem.field_euro == "Да"
+                    ) {
+                        elem.field_euro = "3+";
+                    } else if (elem.field_euro == "Нет") {
+                        elem.field_euro = elem.field_rooms_count;
+                    }
+                });
+            });
             console.log(this.newListRoom);
         },
         setRefs() {
             return this.$refs;
         },
-        openWindow(event) {
-            let left = event.target.getBoundingClientRect().left,
-                top = event.target.getBoundingClientRect().top;
-            this.xPos = left;
-            this.yPos = top;
-            this.allDone = true;
-            if (this.$refs.room_window) {
-                this.$refs.room_window.style.left = `${this.xPos}px`;
-                this.$refs.room_window.style.top = `${this.yPos}px`;
-                // this.$refs.room_window.classList.add("active");
-            }
-        },
-        removeWindow() {
-            if (this.$refs.room_window?.classList.contains("active")) {
-                this.$refs.room_window?.classList.remove("active");
-            }
-            this.allDone = false;
+        // openWindow(event) {
+        //     let left = event.target.getBoundingClientRect().left,
+        //         top = event.target.getBoundingClientRect().top;
+        //     this.xPos = left;
+        //     this.yPos = top;
+        //     this.allDone = true;
+        //     if (this.$refs.room_window) {
+        //         this.$refs.room_window.style.left = `${this.xPos}px`;
+        //         this.$refs.room_window.style.top = `${this.yPos}px`;
+        //         // this.$refs.room_window.classList.add("active");
+        //     }
+        // },
+        // removeWindow() {
+        //     if (this.$refs.room_window?.classList.contains("active")) {
+        //         this.$refs.room_window?.classList.remove("active");
+        //     }
+        //     this.allDone = false;
+        // },
+        getFilteredPeople() {
+            let prices = [];
+            // if (this.checked) {
+            //     prices = this.peoples.filter((f) => f.age > 20);
+            // } else {
+            //     peoples = this.peoples;
+            // }
+            // return peoples.filter((p) =>
+            //     p.name.toLowerCase().includes(this.search.toLowerCase())
+            // );
         },
     },
-    computed: {
-        notAvailable() {
-            return "filter-blocked notAvailable";
-        },
-        soldOut() {
-            return "filter-blocked soldOut";
-        },
-    },
+    computed: {},
     watch: {
         addBodyClass: {
             immediate: true,
@@ -176,13 +283,9 @@ export default {
                 document.body.classList.toggle("not-front", val);
             },
         },
-        // price(newPrice) {
-        //     if (newPrice < this.slider.minRange) {
-        //         this.slider.min = this.slider.minRange;
-        //     } else if (newPrice > this.slider.maxRange) {
-        //         this.slider.max = this.slider.maxRange;
-        //     }
-        // },
+        checked(value) {
+            this.filtered_prices = this.getFilteredPrices();
+        },
     },
     mounted() {
         noUiSlider.create(this.$refs.slider_room, {
@@ -206,42 +309,20 @@ export default {
             },
         });
         this.updateSlider();
-        this.updateScheme();
+        // this.updateScheme();
         this.setRefs();
         // this.getPartArray();
-        // axios
-        //   .get("https://xn--80addhdy.xn--p1ai/rest")
-        //   .then((response) => (this.res = response))
-        //   .catch((error) => console.log(error));
-        // [...noUiSliderParams].forEach((noUiSliderObj) => {
-        //   noUiSlider.create(noUiSliderObj.ref, {
-        //     start: [noUiSliderObj.startMin, noUiSliderObj.startMax],
-        //     step: noUiSliderObj.step,
-        //     connect: true,
-        //     range: {
-        //       min: noUiSliderObj.startMin,
-        //       max: noUiSliderObj.startMax,
-        //     },
-        //   });
-        // noUiSliderObj.ref.noUiSlider.on("update", function (e, values, handle) {
-        //   if (noUiSliderObj.step >= 1) {
-        //     let min = Math.round(e[0]);
-        //     let max = Math.round(e[1]);
-        //     if (!isNaN(min) && !isNaN(max)) {
-        //       noUiSliderObj.minRange = new Intl.NumberFormat("ru-RU").format(min);
-        //       noUiSliderObj.maxRange = new Intl.NumberFormat("ru-RU").format(max);
-        //     }
-        //   } else {
-        //     let min = e[0];
-        //     let max = e[1];
-        //     if (!isNaN(min) && !isNaN(max)) {
-        //       noUiSliderObj.minRange = min;
-        //       noUiSliderObj.maxRange = max;
-        //     }
-        //   }
-        // });
-        // });
     },
+    // async created() {
+    //     try {
+    //         const response = await axios.get(
+    //             "https://xn--80addhdy.xn--p1ai/rest"
+    //         );
+    //         this.res = response.data;
+    //     } catch (e) {
+    //         this.errors.push(e);
+    //     }
+    // },
     beforeMount() {
         this.getPartArray();
     },
@@ -271,13 +352,7 @@ export default {
                                         v-for="(item, index) in el"
                                         :item="item"
                                         :key="item.field_number"
-                                        :notAvailable="notAvailable"
-                                        :soldOut="soldOut"
-                                        :selectedRooms="selectedRooms"
-                                        :slider="this.slider"
-                                        :mainRef="setRefs"
-                                        :openWindow="openWindow"
-                                        :removeWindow="removeWindow" />
+                                        :selectedRooms="selectedRooms" />
                                 </div>
                                 <div class="flat-list__plan">
                                     <a
@@ -340,13 +415,18 @@ export default {
                                     ><span>списком</span></a
                                 >
                             </div>
-                            <button class="main-sale__filter-btn btn">
+                            <button
+                                class="main-sale__filter-btn btn"
+                                @click="openFilter()">
                                 фильтр
                             </button>
-                            <div class="main-sale__filter-wrap">
+                            <div
+                                class="main-sale__filter-wrap"
+                                :class="{ open: isActive }">
                                 <div class="wrapper-top">
                                     <div
-                                        class="wrapper-close main-sale__filter-close"></div>
+                                        class="wrapper-close main-sale__filter-close"
+                                        @click="closeFilter()"></div>
                                     <h3 class="wrapper-title">Фильтр</h3>
                                 </div>
                                 <div class="main-sale__filter-form-wrap">
@@ -517,54 +597,7 @@ export default {
                 </div>
             </div>
         </div>
-        <div
-            ref="room-window"
-            id="room_window"
-            :class="`flat-list__window ${allDone ? 'active' : ''}`"
-            :style="openWindow"
-            v-if="allDone">
-            <div class="wrap">
-                <div class="flat-list__minImg">
-                    <picture
-                        ><source
-                            srcset="img/index/1-k.webp"
-                            type="image/webp" />
-                        <img src="img/index/1-k.png" alt=""
-                    /></picture>
-                </div>
-                <div class="flat-list__info">
-                    <span class="inf">2-комнатная 61,75 м²</span
-                    ><span class="price"> 7 080 000 руб.</span>
-                </div>
-                <a class="mob-btn btn" href="#">подробнее</a
-                ><svg
-                    width="8"
-                    height="5"
-                    viewBox="0 0 8 5"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="triangle">
-                    <path d="M8 0L4 5L0 0H8Z" fill="white" />
-                </svg>
-                <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="mob-close">
-                    <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M5 6.45468L10.5317
-          11.9789L5 17.5119L6.28942 19L11.9259 13.371L17.5624 19L19
-          17.6599L13.32 11.9789L19 6.30663L17.4827 5.02675L11.926
-          10.5845L6.34248 5L5 6.45468Z"
-                        fill="#E1DCDE"
-                        class="mob-close2" />
-                </svg>
-            </div>
-        </div>
+        <!-- <FlatWindow></FlatWindow> -->
     </div>
 </template>
 <!-- 

@@ -1,21 +1,10 @@
 <script>
-export default {
-    props: ["allDone"],
-};
+export default {};
 </script>
 <template>
-    <div ref="flat_window" v-if="allDone" class="flat-list__window">
+    <div ref="flat_window" class="flat-list__window">
         <div class="wrap">
-            <div class="flat-list__minImg">
-                <picture
-                    ><source srcset="img/index/1-k.webp" type="image/webp" />
-                    <img src="img/index/1-k.png" alt=""
-                /></picture>
-            </div>
-            <div class="flat-list__info">
-                <span class="inf">2-комнатная 61,75 м²</span
-                ><span class="price"> 7 080 000 руб.</span>
-            </div>
+            <slot></slot>
             <a class="mob-btn btn" href="#">подробнее</a
             ><svg
                 width="8"

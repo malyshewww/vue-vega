@@ -1,38 +1,55 @@
 <script>
+import FlatWindow from "./FlatWindow.vue";
 export default {
-    props: [
-        "item",
-        "notAvailable",
-        "soldOut",
-        "selectedRooms",
-        "slider",
-        "mainRef",
-        "openWindow",
-        "removeWindow",
-    ],
+    components: {
+        FlatWindow,
+    },
+    props: ["item", "selectedRooms"],
+    // inject: ["user"],
     data() {
         return {
-            filterData: [],
+            roomsWindow: document.querySelector(".flat-list__window"),
+            isInfoWindowVisible: false,
+            xPos: 0,
+            yPos: 0,
         };
     },
-    methods: {},
-    computed: {
-        normalizedPrice() {
-            return this.item.field_price.replace("руб.", "").trim();
+    methods: {
+        showWindow(e) {
+            let target = e.target;
+            let left = target.getBoundingClientRect().left;
+            let top = target.getBoundingClientRect().top;
+            this.xPos = left;
+            this.yPos = top;
+            this.isInfoWindowVisible = !this.isInfoWindowVisible;
+            console.log("show window");
         },
+        hideWindow() {
+            this.isInfoWindowVisible = !this.isInfoWindowVisible;
+            console.log("hide window");
+        },
+        handleMouseLeave(e) {
+            this.constructWindow(e);
+            console.log(
+                e.target.getBoundingClientRect().top,
+                e.target.getBoundingClientRect().left
+            );
+            console.log(e.target.dataset.price, "mouse leave");
+        },
+    },
+    computed: {
         addClass() {
             switch (this.item.field_status) {
                 case "Забронировано":
-                    return this.notAvailable;
+                    return "filter-blocked notAvailable";
                 case "Продано":
-                    return this.soldOut;
+                    return "filter-blocked soldOut";
                 default:
                     return "";
             }
         },
         blockedRooms() {
-            let separator = this.item.field_euro == "Да" ? "+" : "";
-            let roomsCountStr = this.item.field_rooms_count + separator;
+            let roomsCountStr = this.item.field_euro;
             return roomsCountStr;
         },
         setBlockedClass() {
@@ -41,25 +58,58 @@ export default {
                 return "filter-blocked";
             }
         },
+        replaceExpansionImage() {
+            let newImagePath = this.item.field_plan_image.replace(".png", "");
+            return newImagePath;
+        },
+        setStyleObject() {
+            let styleObject = {
+                left: this.xPos + "px",
+                top: this.yPos + "px",
+            };
+            return styleObject;
+        },
     },
     mounted() {
-        // this.getRefs();
-        // return this.refs;
+        // this.setStyleObject();
     },
 };
 </script>
 <template>
+    <FlatWindow
+        :class="{ active: isInfoWindowVisible }"
+        v-if="isInfoWindowVisible"
+        :style="setStyleObject">
+        <div class="flat-list__minImg">
+            <!-- <picture>
+                <source
+                    :srcset="`${replaceExpansionImage}.webp`"
+                    type="image/webp" />
+                <img :src="`${replaceExpansionImage}.png`" alt="" />
+            </picture> -->
+        </div>
+        <div class="flat-list__info">
+            <span class="inf"
+                >{{ item.field_rooms_count }}-комнатная
+                {{ item.field_square }} м²</span
+            ><span class="price">{{ item.field_price }} руб.</span>
+        </div>
+    </FlatWindow>
     <a
-        :class="`flat-list__room ${addClass} ${setBlockedClass}`"
+        class="flat-list__room"
+        :class="[
+            addClass ? addClass : '',
+            setBlockedClass ? setBlockedClass : '',
+        ]"
         :data-id="item.field_number"
         :href="`./flats/${item.field_number}`"
-        :data-price="normalizedPrice"
+        :data-price="item.field_price"
         :data-area="item.field_square"
         :data-img="item.field_plan_image"
         :rooms="item.field_rooms_count"
-        @mouseover="openWindow"
-        @mouseout="removeWindow">
-        {{ blockedRooms }}
+        @mouseenter="showWindow"
+        @mouseleave="hideWindow">
+        {{ item.field_euro }}
     </a>
 </template>
 <style></style>
