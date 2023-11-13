@@ -5,13 +5,15 @@ export default {
         FlatWindow,
     },
     props: ["item", "selectedRooms"],
-    // inject: ["user"],
     data() {
         return {
             roomsWindow: document.querySelector(".flat-list__window"),
             isInfoWindowVisible: false,
-            xPos: 0,
-            yPos: 0,
+            stylesWindow: {
+                xPos: 0,
+                yPos: 0,
+                transform: null,
+            },
         };
     },
     methods: {
@@ -19,22 +21,15 @@ export default {
             let target = e.target;
             let left = target.getBoundingClientRect().left;
             let top = target.getBoundingClientRect().top;
-            this.xPos = left;
-            this.yPos = top;
+            this.stylesWindow.xPos = `${left}px`;
+            this.stylesWindow.yPos = `${top}px`;
+            this.stylesWindow.transform = `translate(-43%, -110%)`;
             this.isInfoWindowVisible = !this.isInfoWindowVisible;
-            console.log("show window");
+            // console.log("show window");
         },
         hideWindow() {
             this.isInfoWindowVisible = !this.isInfoWindowVisible;
-            console.log("hide window");
-        },
-        handleMouseLeave(e) {
-            this.constructWindow(e);
-            console.log(
-                e.target.getBoundingClientRect().top,
-                e.target.getBoundingClientRect().left
-            );
-            console.log(e.target.dataset.price, "mouse leave");
+            // console.log("hide window");
         },
     },
     computed: {
@@ -64,8 +59,9 @@ export default {
         },
         setStyleObject() {
             let styleObject = {
-                left: this.xPos + "px",
-                top: this.yPos + "px",
+                left: this.stylesWindow.xPos,
+                top: this.stylesWindow.yPos,
+                transform: this.stylesWindow.transform,
             };
             return styleObject;
         },
