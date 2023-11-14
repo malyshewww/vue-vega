@@ -4,7 +4,7 @@ export default {
     components: {
         FlatWindow,
     },
-    props: ["item", "selectedRooms"],
+    props: ["item", "selectedRooms", "filteredRooms"],
     data() {
         return {
             roomsWindow: document.querySelector(".flat-list__window"),
@@ -50,6 +50,12 @@ export default {
         setBlockedClass() {
             if (this.selectedRooms.length) {
                 if (this.selectedRooms.includes(this.blockedRooms)) return;
+                return "filter-blocked";
+            }
+            if (
+                this.selectedRooms.length &&
+                this.item.newStatus == "no-active"
+            ) {
                 return "filter-blocked";
             }
         },

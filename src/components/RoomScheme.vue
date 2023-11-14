@@ -3,8 +3,8 @@ import noUiSlider from "nouislider";
 import axios from "axios";
 import json from "../data.json";
 import FlatItem from "./Rooms/FlatItem.vue";
-import FlatWindow from "./Rooms/FlatWindow.vue";
-import { ref, onMounted, onUnmounted } from "vue";
+// import FlatWindow from "./Rooms/FlatWindow.vue";
+// import { ref, onMounted, onUnmounted } from "vue";
 import NavigationBtn from "./NavigationBtn.vue";
 const appData = {};
 export default {
@@ -23,7 +23,6 @@ export default {
             errors: [],
             res: [],
             isActive: false,
-            allDone: false,
             xPos: "",
             yPos: "",
             info: json,
@@ -109,6 +108,7 @@ export default {
         closeFilter() {
             this.isActive = false;
         },
+        // События для nouislider (update, change) для обновления данных
         updateSlider() {
             this.$refs.slider_room.noUiSlider.on(
                 "update",
@@ -139,27 +139,108 @@ export default {
                 }
             );
             this.$refs.slider_room.noUiSlider.on("change", (e) => {
-                // if (this.filtered_rooms.length > 0) {
-                //     this.filtered_rooms = [];
-                // }
-                let min = e[0];
-                let max = e[1];
-                if (this.selectedRooms.length === 0) {
-                    this.newListRoom.map((item) => {
-                        item.filter((f, i) => {
-                            if (f.field_status == "В продаже") {
+                this.filtered_rooms = [];
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.newListRoom.map((item) => {
+                    item.map((f, i) => {
+                        if (f.field_status == "В продаже") {
+                            if (
+                                +f.field_price >= min &&
+                                +f.field_price <= max
+                            ) {
                                 this.filtered_rooms.push(f);
+                                f.newStatus = "active";
+                            } else {
+                                f.newStatus = "no-active";
                             }
-                        });
+                        }
                     });
-                    this.filtered_rooms.filter(
-                        (item) =>
-                            min <= item.field_price && max <= item.field_price
-                    );
-                    console.log(this.filtered_rooms);
-                    console.log(min, max);
+                });
+                this.updateSquareRange(this.filtered_rooms);
+                let arrMinValue = [];
+                if (this.filtered_rooms.length) {
+                    // this.filtered_rooms.forEach((el) => {
+                    //     arrMinValue.push(el.field_price);
+                    //     if (!this.selectedRooms.includes(el.field_euro)) {
+                    //         console.log(el);
+                    //     }
+                    // });
+                    // let minPrice = Math.min(...arrMinValue);
+                    // console.log(minPrice);
                 }
+                // console.log(this.selectedRooms);
+                // console.log(this.filtered_rooms);
+                // console.log(this.newListRoom);
             });
+            this.$refs.slider_area.noUiSlider.on("change", (e) => {
+                this.filtered_rooms = [];
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.newListRoom.map((item) => {
+                    item.map((f, i) => {
+                        if (f.field_status == "В продаже") {
+                            if (
+                                +f.field_square >= min &&
+                                +f.field_square <= max
+                            ) {
+                                this.filtered_rooms.push(f);
+                                f.newStatus = "active";
+                            } else {
+                                f.newStatus = "no-active";
+                            }
+                        }
+                    });
+                });
+                this.updateRoomRange(this.filtered_rooms);
+                // console.log(this.newListRoom);
+            });
+        },
+        // Обновление range площадей квартир при change slider_room
+        updateSquareRange(arr) {
+            let accSquare = [];
+            if (arr.length) {
+                arr.forEach((item) => {
+                    accSquare.push(item.field_square);
+                });
+                this.area.minRange = accSquare.length
+                    ? Math.min(...accSquare)
+                    : this.area.startMin;
+                this.area.maxRange = accSquare.length
+                    ? Math.max(...accSquare)
+                    : this.area.startMax;
+                this.setNewValuesSliderArea();
+            }
+        },
+        // Обновление range количества комнат при change slider_area
+        updateRoomRange(arr) {
+            let accPrices = [];
+            if (arr.length) {
+                arr.forEach((item) => {
+                    accPrices.push(item.field_price);
+                });
+                this.slider.minRange = accPrices.length
+                    ? Math.min(...accPrices)
+                    : this.slider.startMin;
+                this.slider.maxRange = accPrices.length
+                    ? Math.max(...accPrices)
+                    : this.slider.startMax;
+                this.setNewValuesSliderRoom();
+            }
+        },
+        // Новые значения для range "количество комнат"
+        setNewValuesSliderRoom() {
+            this.$refs.slider_room.noUiSlider.set([
+                this.slider.minRange,
+                this.slider.maxRange,
+            ]);
+        },
+        // Новые значения для range "площадь квартиры"
+        setNewValuesSliderArea() {
+            this.$refs.slider_area.noUiSlider.set([
+                this.area.minRange,
+                this.area.maxRange,
+            ]);
         },
         updateMinPrice(arr) {
             let arrMinPrices = arr.flatMap((item, i) =>
@@ -299,8 +380,23 @@ export default {
                 document.body.classList.toggle("not-front", val);
             },
         },
-        checked(value) {
-            this.filtered_prices = this.getFilteredPrices();
+        setNewRange() {
+            this.$refs?.slider_room.noUiSlider.on(
+                "update",
+                (e, values, handle) => {
+                    let min = Math.round(e[0]);
+                    let max = Math.round(e[1]);
+                    if (!isNaN(min) && !isNaN(max)) {
+                        // this[handle ? "maxRange" : "minRange"] = parseInt(values[handle]);
+                        this.slider.minRange = new Intl.NumberFormat(
+                            "ru-RU"
+                        ).format(min);
+                        this.slider.maxRange = new Intl.NumberFormat(
+                            "ru-RU"
+                        ).format(max);
+                    }
+                }
+            );
         },
     },
     mounted() {
@@ -325,7 +421,6 @@ export default {
             },
         });
         this.updateSlider();
-        // this.updateScheme();
         this.setRefs();
         // this.getPartArray();
     },
@@ -368,7 +463,8 @@ export default {
                                         v-for="(item, index) in el"
                                         :item="item"
                                         :key="item.field_number"
-                                        :selectedRooms="selectedRooms" />
+                                        :selectedRooms="selectedRooms"
+                                        :filteredRooms="filtered_rooms" />
                                 </div>
                                 <div class="flat-list__plan">
                                     <a
@@ -448,32 +544,28 @@ export default {
                                                         <span
                                                             class="filter-slider-from"
                                                             >от
-                                                            <input
-                                                                class="filter-slider-from-value"
-                                                                v-model="
+                                                            <span
+                                                                class="filter-slider-from-value">
+                                                                {{
                                                                     slider.minRange
-                                                                "
-                                                                :readonly="
-                                                                    true
-                                                                " />
+                                                                }}
+                                                            </span>
                                                         </span>
                                                         <span
                                                             class="filter-slider-to"
                                                             >до
-                                                            <input
+                                                            <span
                                                                 class="filter-slider-to-value"
-                                                                v-model="
+                                                                >{{
                                                                     slider.maxRange
-                                                                "
-                                                                :readonly="
-                                                                    true
-                                                                " />
+                                                                }}</span
+                                                            >
                                                         </span>
                                                     </div>
                                                     <div
                                                         class="filter-slider-line"
                                                         ref="slider_room"
-                                                        id="slider_room" />
+                                                        id="slider_room"></div>
                                                 </div>
                                             </fieldset>
                                             <fieldset
@@ -487,19 +579,22 @@ export default {
                                                         <span
                                                             class="filter-slider-from"
                                                             >от
-                                                            <input
+                                                            <span
                                                                 class="filter-slider-from-value"
-                                                                v-model="
+                                                                >{{
                                                                     area.minRange
-                                                                " />
+                                                                }}</span
+                                                            >
                                                         </span>
                                                         <span
                                                             class="filter-slider-to"
-                                                            >до<input
+                                                            >до
+                                                            <span
                                                                 class="filter-slider-to-value"
-                                                                v-model="
+                                                                >{{
                                                                     area.maxRange
-                                                                " />
+                                                                }}</span
+                                                            >
                                                         </span>
                                                     </div>
                                                     <div
