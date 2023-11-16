@@ -1,6 +1,16 @@
 <script>
 import NavigationBtn from "./NavigationBtn.vue";
 import FieldRooms from "./FieldRooms.vue";
+import json from "../data.json";
+import {
+    checkboxObj,
+    initRange,
+    updateSliderRoom,
+    updateSliderArea,
+    updateSliderFloor,
+    updateSquareRange,
+    setNewValue,
+} from "../helpers/utils.js";
 export default {
     components: {
         NavigationBtn,
@@ -8,33 +18,84 @@ export default {
     },
     data() {
         return {
+            dataList: json,
             selectedRooms: [],
-            listCheckboxes: [
-                {
-                    value: "1",
-                },
-                {
-                    value: "1+",
-                },
-                {
-                    value: "2",
-                },
-                {
-                    value: "2+",
-                },
-                {
-                    value: "3",
-                },
-                {
-                    value: "3+",
-                },
-            ],
+            listCheckboxes: checkboxObj,
+            slider: {
+                minRange: null,
+                maxRange: null,
+                startMin: 5000000,
+                startMax: 13500000,
+                step: 10000, // 10000
+                min: 5000000,
+                max: 13500000,
+            },
+            area: {
+                minRange: null,
+                maxRange: null,
+                startMin: 35.95,
+                startMax: 72.35,
+                step: 0.1,
+                min: 35.95,
+                max: 72.35,
+            },
+            floor: {
+                minRange: null,
+                maxRange: null,
+                startMin: 2,
+                startMax: 15,
+                step: 1,
+                min: 2,
+                max: 15,
+            },
+            filtered_rooms: [],
         };
     },
     methods: {
-        updateSelectedRooms() {
+        updateCheckboxes(target) {
+            target.checked
+                ? this.selectedRooms.push(target.value)
+                : this.selectedRooms.splice(
+                      this.selectedRooms.indexOf(target.value),
+                      1
+                  );
             console.log(this.selectedRooms);
         },
+        updateSlider() {
+            updateSliderRoom(this.$refs.slider_room, this.slider);
+            updateSliderArea(this.$refs.slider_area, this.area);
+            updateSliderFloor(this.$refs.slider_floor, this.floor);
+            this.$refs.slider_room.noUiSlider.on("change", (e) => {
+                this.filtered_rooms = [];
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.dataList.map((item, i) => {
+                    item.field_price = item.field_price
+                        .replace("руб.", "")
+                        .trim();
+                    if (item.field_status == "В продаже") {
+                        if (
+                            +item.field_price >= min &&
+                            +item.field_price <= max
+                        ) {
+                            this.filtered_rooms.push(item);
+                        } else {
+                        }
+                    }
+                });
+                console.log(this.filtered_rooms);
+                updateSquareRange(this.filtered_rooms, this.area);
+                setNewValue(this.$refs.slider_area, this.area);
+            });
+        },
+    },
+    mounted() {
+        // Инициализация слайдеров
+        initRange(this.$refs.slider_room, this.slider);
+        initRange(this.$refs.slider_area, this.area);
+        initRange(this.$refs.slider_floor, this.floor);
+        this.updateSlider();
+        console.log(this.dataList);
     },
 };
 </script>
@@ -54,48 +115,35 @@ export default {
                         <div class="main-sale__filter-form-wrap">
                             <form action="#">
                                 <div class="main-sale__filter-top">
-                                    <fieldset class="main-sale__filter-rooms">
-                                        <legend>Количество комнат</legend>
-                                        <ul>
-                                            <li
-                                                v-for="(
-                                                    checkbox, idx
-                                                ) in listCheckboxes">
-                                                <input
-                                                    :id="`rooms-${idx}`"
-                                                    type="checkbox"
-                                                    :value="checkbox.value"
-                                                    @change="
-                                                        updateSelectedRooms
-                                                    "
-                                                    v-model="selectedRooms"
-                                                    name="field_rooms_count[]" />
-                                                <label :for="`rooms-${idx}`">{{
-                                                    checkbox.value
-                                                }}</label>
-                                            </li>
-                                        </ul>
-                                    </fieldset>
+                                    <FieldRooms
+                                        @updateCheckboxes="
+                                            updateCheckboxes
+                                        "></FieldRooms>
                                     <fieldset class="main-sale__filter-price">
                                         <legend>Количество комнат</legend>
                                         <div class="filter-slider">
                                             <div class="filter-slider-top">
                                                 <span class="filter-slider-from"
-                                                    >от<span
-                                                        class="filter-slider-from-value"
-                                                        data-min="5000000"
-                                                        >5000000</span
-                                                    ></span
-                                                ><span class="filter-slider-to"
-                                                    >до<span
+                                                    >от
+                                                    <span
+                                                        class="filter-slider-from-value">
+                                                        {{ slider.minRange }}
+                                                    </span>
+                                                </span>
+                                                <span class="filter-slider-to"
+                                                    >до
+                                                    <span
                                                         class="filter-slider-to-value"
-                                                        data-max="13500000"
-                                                        >13500000</span
-                                                    ></span
-                                                >
+                                                        >{{
+                                                            slider.maxRange
+                                                        }}</span
+                                                    >
+                                                </span>
                                             </div>
                                             <div
-                                                class="filter-slider-line"></div>
+                                                class="filter-slider-line"
+                                                ref="slider_room"
+                                                id="slider_room"></div>
                                         </div>
                                     </fieldset>
                                     <fieldset class="main-sale__filter-floor">
@@ -105,19 +153,23 @@ export default {
                                                 <span class="filter-slider-from"
                                                     >от<span
                                                         class="filter-slider-from-value"
-                                                        data-min="2"
-                                                        >2</span
+                                                        >{{
+                                                            floor.minRange
+                                                        }}</span
                                                     ></span
                                                 ><span class="filter-slider-to"
                                                     >до<span
                                                         class="filter-slider-to-value"
-                                                        data-max="15"
-                                                        >15</span
+                                                        >{{
+                                                            floor.maxRange
+                                                        }}</span
                                                     ></span
                                                 >
                                             </div>
                                             <div
-                                                class="filter-slider-line"></div>
+                                                class="filter-slider-line"
+                                                ref="slider_floor"
+                                                id="slider_floor"></div>
                                         </div>
                                     </fieldset>
                                     <fieldset class="main-sale__filter-area">
@@ -125,26 +177,33 @@ export default {
                                         <div class="filter-slider">
                                             <div class="filter-slider-top">
                                                 <span class="filter-slider-from"
-                                                    >от<span
+                                                    >от
+                                                    <span
                                                         class="filter-slider-from-value"
-                                                        data-min="34.5"
-                                                        >34.5</span
-                                                    ></span
-                                                ><span class="filter-slider-to"
-                                                    >до<span
+                                                        >{{
+                                                            area.minRange
+                                                        }}</span
+                                                    >
+                                                </span>
+                                                <span class="filter-slider-to"
+                                                    >до
+                                                    <span
                                                         class="filter-slider-to-value"
-                                                        data-max="68"
-                                                        >68</span
-                                                    ></span
-                                                >
+                                                        >{{
+                                                            area.maxRange
+                                                        }}</span
+                                                    >
+                                                </span>
                                             </div>
                                             <div
-                                                class="filter-slider-line"></div>
+                                                class="filter-slider-line"
+                                                ref="slider_area"
+                                                id="slider_area"></div>
                                         </div>
                                     </fieldset>
                                 </div>
                                 <div class="main-sale__filter-bottom">
-                                    <fieldset class="main-sale__filter-params">
+                                    <!-- <fieldset class="main-sale__filter-params">
                                         <legend>
                                             Дополнительные параметры
                                         </legend>
@@ -171,7 +230,7 @@ export default {
                                                 >
                                             </li>
                                         </ul>
-                                    </fieldset>
+                                    </fieldset> -->
                                     <div
                                         class="main-sale__filter-reset btn-border">
                                         сбросить фильтр

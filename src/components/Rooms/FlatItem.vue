@@ -32,6 +32,7 @@ export default {
             // console.log("hide window");
         },
     },
+    watch: {},
     computed: {
         addClass() {
             switch (this.item.field_status) {
@@ -41,22 +42,6 @@ export default {
                     return "filter-blocked soldOut";
                 default:
                     return "";
-            }
-        },
-        blockedRooms() {
-            let roomsCountStr = this.item.field_euro;
-            return roomsCountStr;
-        },
-        setBlockedClass() {
-            if (this.selectedRooms.length) {
-                if (this.selectedRooms.includes(this.blockedRooms)) return;
-                return "filter-blocked";
-            }
-            if (
-                this.selectedRooms.length &&
-                this.item.newStatus == "no-active"
-            ) {
-                return "filter-blocked";
             }
         },
         replaceExpansionImage() {
@@ -71,8 +56,28 @@ export default {
             };
             return styleObject;
         },
+        blockedRooms() {
+            let roomsCountStr = this.item.newRoom;
+            return roomsCountStr;
+        },
+        setBlockedClass() {
+            if (this.selectedRooms.length) {
+                if (this.selectedRooms.includes(this.blockedRooms)) return;
+                return "filter-blocked";
+            }
+            if (this.selectedRooms.length && this.item.newStatus == false) {
+                return "filter-blocked";
+            } else if (
+                this.selectedRooms.length == 0 &&
+                this.item.newStatus == false
+            ) {
+                return "filter-blocked";
+            }
+        },
     },
     mounted() {
+        // this.getStatusRoom();
+        // console.log(this.item.newStatus);
         // this.setStyleObject();
     },
 };
@@ -111,7 +116,7 @@ export default {
         :rooms="item.field_rooms_count"
         @mouseenter="showWindow"
         @mouseleave="hideWindow">
-        {{ item.field_euro }}
+        {{ item.newRoom }}
     </a>
 </template>
 <style></style>

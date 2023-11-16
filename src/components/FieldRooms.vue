@@ -1,46 +1,37 @@
 <script>
+import { checkboxObj } from "../helpers/utils";
+
 export default {
-    props: ["listCheckboxes", "checkbox"],
+    props: ["updateScheme"],
     components: {},
     data() {
         return {
-            listCheckboxes: [
-                {
-                    value: "1",
-                },
-                {
-                    value: "1+",
-                },
-                {
-                    value: "2",
-                },
-                {
-                    value: "2+",
-                },
-                {
-                    value: "3",
-                },
-                {
-                    value: "3+",
-                },
-            ],
+            listCheckboxes: checkboxObj,
         };
     },
     methods: {
-        selectedRooms() {
-            this.$emit("countSelectedRooms", this.value);
+        updateCheckboxes(e) {
+            this.$emit("updateCheckboxes", e.target);
         },
+        // selectedRooms() {
+        //     this.$emit("countSelectedRooms", this.value);
+        // },
     },
 };
 </script>
 <template>
-    <li>
-        <input
-            :id="`rooms-${idx}`"
-            type="checkbox"
-            :value="checkbox.value"
-            @change="updateSelectedRooms"
-            name="field_rooms_count[]" />
-        <label :for="`rooms-${idx}`">{{ checkbox.value }}</label>
-    </li>
+    <fieldset class="main-sale__filter-rooms">
+        <legend>Количество комнат</legend>
+        <ul>
+            <li v-for="(checkbox, index) in listCheckboxes">
+                <input
+                    :id="`rooms-${index}`"
+                    type="checkbox"
+                    :value="checkbox.value"
+                    @change="updateCheckboxes"
+                    name="field_rooms_count[]" />
+                <label :for="`rooms-${index}`">{{ checkbox.value }}</label>
+            </li>
+        </ul>
+    </fieldset>
 </template>

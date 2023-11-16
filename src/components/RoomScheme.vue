@@ -6,12 +6,22 @@ import FlatItem from "./Rooms/FlatItem.vue";
 // import FlatWindow from "./Rooms/FlatWindow.vue";
 // import { ref, onMounted, onUnmounted } from "vue";
 import NavigationBtn from "./NavigationBtn.vue";
-const appData = {};
+import {
+    initRange,
+    checkboxObj,
+    updateSliderRoom,
+    updateSliderArea,
+    updateSquareRange,
+    setNewValue,
+} from "../helpers/utils.js";
+// Подключение компонента с чекбоксами
+import FieldRooms from "./FieldRooms.vue";
 export default {
     components: {
         noUiSlider,
         FlatItem,
         NavigationBtn,
+        FieldRooms,
     },
     // provide() {
     //     return {
@@ -49,26 +59,7 @@ export default {
                 "15",
             ],
             listRoomFirst: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-            listCheckboxes: [
-                {
-                    value: "1",
-                },
-                {
-                    value: "1+",
-                },
-                {
-                    value: "2",
-                },
-                {
-                    value: "2+",
-                },
-                {
-                    value: "3",
-                },
-                {
-                    value: "3+",
-                },
-            ],
+            listCheckboxes: checkboxObj,
             res: [],
             slider: {
                 minRange: null,
@@ -88,16 +79,6 @@ export default {
                 min: 35.95,
                 max: 72.35,
             },
-            floor: {
-                minRange: null,
-                maxRange: null,
-                startMin: 2,
-                startMax: 15,
-                step: 1,
-                min: 2,
-                max: 15,
-            },
-            flatWindow: document.querySelector(".flat-list__window"),
             filtered_rooms: [],
         };
     },
@@ -110,39 +91,13 @@ export default {
         },
         // События для nouislider (update, change) для обновления данных
         updateSlider() {
-            this.$refs.slider_room.noUiSlider.on(
-                "update",
-                (e, values, handle) => {
-                    let min = Math.round(e[0]);
-                    let max = Math.round(e[1]);
-                    if (!isNaN(min) && !isNaN(max)) {
-                        // this[handle ? "maxRange" : "minRange"] = parseInt(values[handle]);
-                        this.slider.minRange = new Intl.NumberFormat(
-                            "ru-RU"
-                        ).format(min);
-                        this.slider.maxRange = new Intl.NumberFormat(
-                            "ru-RU"
-                        ).format(max);
-                    }
-                }
-            );
-            this.$refs.slider_area.noUiSlider.on(
-                "update",
-                (e, values, handle) => {
-                    let min = e[0];
-                    let max = e[1];
-                    if (!isNaN(min) && !isNaN(max)) {
-                        // this[handle ? "maxRange" : "minRange"] = parseInt(values[handle]);
-                        this.area.minRange = min;
-                        this.area.maxRange = max;
-                    }
-                }
-            );
+            updateSliderRoom(this.$refs.slider_room, this.slider);
+            updateSliderArea(this.$refs.slider_area, this.area);
             this.$refs.slider_room.noUiSlider.on("change", (e) => {
                 this.filtered_rooms = [];
                 let min = Math.round(e[0]);
                 let max = Math.round(e[1]);
-                this.newListRoom.map((item) => {
+                this.newListRoom.filter((item) => {
                     item.map((f, i) => {
                         if (f.field_status == "В продаже") {
                             if (
@@ -150,67 +105,65 @@ export default {
                                 +f.field_price <= max
                             ) {
                                 this.filtered_rooms.push(f);
-                                f.newStatus = "active";
+                                f.newStatus = true;
                             } else {
-                                f.newStatus = "no-active";
+                                f.newStatus = false;
                             }
                         }
                     });
                 });
-                this.updateSquareRange(this.filtered_rooms);
-                let arrMinValue = [];
-                if (this.filtered_rooms.length) {
-                    // this.filtered_rooms.forEach((el) => {
-                    //     arrMinValue.push(el.field_price);
-                    //     if (!this.selectedRooms.includes(el.field_euro)) {
-                    //         console.log(el);
-                    //     }
-                    // });
-                    // let minPrice = Math.min(...arrMinValue);
-                    // console.log(minPrice);
-                }
-                // console.log(this.selectedRooms);
-                // console.log(this.filtered_rooms);
                 // console.log(this.newListRoom);
+                // console.log(this.filtered_rooms);
+                updateSquareRange(this.filtered_rooms, this.area);
+                setNewValue(this.$refs.slider_area, this.area);
+                this.watchRange(this.newListRoom, min, max);
             });
             this.$refs.slider_area.noUiSlider.on("change", (e) => {
                 this.filtered_rooms = [];
                 let min = Math.round(e[0]);
                 let max = Math.round(e[1]);
-                this.newListRoom.map((item) => {
+                this.newListRoom.filter((item) => {
                     item.map((f, i) => {
                         if (f.field_status == "В продаже") {
                             if (
                                 +f.field_square >= min &&
                                 +f.field_square <= max
                             ) {
+                                f.newStatus = true;
                                 this.filtered_rooms.push(f);
+                            } else {
+                                f.newStatus = false;
+                            }
+                        }
+                    });
+                });
+                this.updateRoomRange(this.filtered_rooms);
+                setNewValue(this.$refs.slider_room, this.slider);
+                console.log(this.newListRoom);
+            });
+        },
+        watchRange(arr, min, max) {
+            let arrPrices = [];
+            let minPrice = null;
+            if (arr.length && this.selectedRooms.length) {
+                arr.filter((item) => {
+                    item.map((f, i) => {
+                        if (f.field_status == "В продаже") {
+                            if (
+                                +f.field_price >= min &&
+                                +f.field_price <= max
+                            ) {
+                                console.log(f);
                                 f.newStatus = "active";
+                                // this.filtered_rooms.push(f);
                             } else {
                                 f.newStatus = "no-active";
                             }
                         }
                     });
                 });
-                this.updateRoomRange(this.filtered_rooms);
-                // console.log(this.newListRoom);
-            });
-        },
-        // Обновление range площадей квартир при change slider_room
-        updateSquareRange(arr) {
-            let accSquare = [];
-            if (arr.length) {
-                arr.forEach((item) => {
-                    accSquare.push(item.field_square);
-                });
-                this.area.minRange = accSquare.length
-                    ? Math.min(...accSquare)
-                    : this.area.startMin;
-                this.area.maxRange = accSquare.length
-                    ? Math.max(...accSquare)
-                    : this.area.startMax;
-                this.setNewValuesSliderArea();
             }
+            console.log(this.newListRoom);
         },
         // Обновление range количества комнат при change slider_area
         updateRoomRange(arr) {
@@ -225,22 +178,9 @@ export default {
                 this.slider.maxRange = accPrices.length
                     ? Math.max(...accPrices)
                     : this.slider.startMax;
-                this.setNewValuesSliderRoom();
+            } else {
+                this.selectedRooms = [];
             }
-        },
-        // Новые значения для range "количество комнат"
-        setNewValuesSliderRoom() {
-            this.$refs.slider_room.noUiSlider.set([
-                this.slider.minRange,
-                this.slider.maxRange,
-            ]);
-        },
-        // Новые значения для range "площадь квартиры"
-        setNewValuesSliderArea() {
-            this.$refs.slider_area.noUiSlider.set([
-                this.area.minRange,
-                this.area.maxRange,
-            ]);
         },
         updateMinPrice(arr) {
             let arrMinPrices = arr.flatMap((item, i) =>
@@ -275,39 +215,45 @@ export default {
                 : this.area.startMax;
         },
         setNewSliderValues() {
-            this.$refs.slider_room.noUiSlider.set([
-                this.slider.minRange,
-                this.slider.maxRange,
-            ]);
-            this.$refs.slider_area.noUiSlider.set([
-                this.area.minRange,
-                this.area.maxRange,
-            ]);
+            let minValueRoom = this.selectedRooms.length
+                ? this.slider.minRange
+                : this.slider.startMin;
+            let maxValueRoom = this.selectedRooms.length
+                ? this.slider.maxRange
+                : this.slider.startMax;
+            let minValueArea = this.selectedRooms.length
+                ? this.area.minRange
+                : this.area.startMin;
+            let maxValueArea = this.selectedRooms.length
+                ? this.area.maxRange
+                : this.area.startMax;
+            this.$refs.slider_room.noUiSlider.set([minValueRoom, maxValueRoom]);
+            this.$refs.slider_area.noUiSlider.set([minValueArea, maxValueArea]);
         },
-        updateScheme(e) {
-            console.log(e.target.value);
+        updateScheme(target) {
+            console.log(target.value);
             this.newListRoom.map((item) => {
                 item.filter((f, i) => {
                     if (
-                        e.target.value == f.field_euro &&
+                        target.value == f.newRoom &&
                         f.field_status == "В продаже"
                     ) {
-                        this.updateMinPrice(this.arrPrices, e.target);
-                        this.updateMaxPrice(this.arrPrices, e.target);
+                        this.updateMinPrice(this.arrPrices);
+                        this.updateMaxPrice(this.arrPrices);
                         this.updateMinSquare(this.arrSquare);
                         this.updateMaxSquare(this.arrSquare);
                         this.setNewSliderValues();
-                        if (e.target.checked) {
+                        if (target.checked) {
                             this.updateListRoom.push(f);
                             this.arrPrices.push({
                                 id: f.field_number,
                                 price: f.field_price,
-                                room: f.field_euro,
+                                room: f.newRoom,
                             });
                             this.arrSquare.push({
                                 id: f.field_number,
                                 square: f.field_square,
-                                room: f.field_euro,
+                                room: f.newRoom,
                             });
                         } else {
                             this.updateListRoom.splice(
@@ -319,8 +265,6 @@ export default {
                 });
             });
             console.log(this.updateListRoom);
-            // console.log(this.selectedRooms);
-            // console.log(this.arrPrices);
         },
         getPartArray() {
             let size = 9; // размер подмассива
@@ -330,7 +274,7 @@ export default {
                     i * size + size
                 );
             }
-            this.newListRoom.forEach((item, i) => {
+            this.newListRoom.map((item, i) => {
                 item.map((elem) => {
                     elem.field_price = elem.field_price
                         .replace("руб.", "")
@@ -339,37 +283,32 @@ export default {
                         elem.field_rooms_count == "1" &&
                         elem.field_euro == "Да"
                     ) {
-                        elem.field_euro = "1+";
+                        elem.newRoom = "1+";
                     } else if (
                         elem.field_rooms_count == "2" &&
                         elem.field_euro == "Да"
                     ) {
-                        elem.field_euro = "2+";
+                        elem.newRoom = "2+";
                     } else if (
                         elem.field_rooms_count == "3" &&
                         elem.field_euro == "Да"
                     ) {
-                        elem.field_euro = "3+";
+                        elem.newRoom = "3+";
                     } else if (elem.field_euro == "Нет") {
-                        elem.field_euro = elem.field_rooms_count;
+                        elem.newRoom = elem.field_rooms_count;
                     }
                 });
             });
             console.log(this.newListRoom);
         },
-        setRefs() {
-            return this.$refs;
-        },
-        getFilteredPeople() {
-            let prices = [];
-            // if (this.checked) {
-            //     prices = this.peoples.filter((f) => f.age > 20);
-            // } else {
-            //     peoples = this.peoples;
-            // }
-            // return peoples.filter((p) =>
-            //     p.name.toLowerCase().includes(this.search.toLowerCase())
-            // );
+        updateCheckboxes(target) {
+            target.checked
+                ? this.selectedRooms.push(target.value)
+                : this.selectedRooms.splice(
+                      this.selectedRooms.indexOf(target.value),
+                      1
+                  );
+            this.updateScheme(target);
         },
     },
     computed: {},
@@ -400,29 +339,10 @@ export default {
         },
     },
     mounted() {
-        noUiSlider.create(this.$refs.slider_room, {
-            start: [this.slider.startMin, this.slider.startMax],
-            step: this.slider.step,
-            connect: true,
-            // tooltips: true,
-            range: {
-                min: this.slider.min,
-                max: this.slider.max,
-            },
-        });
-        noUiSlider.create(this.$refs.slider_area, {
-            start: [this.area.startMin, this.area.startMax],
-            step: this.area.step,
-            connect: true,
-            // tooltips: true,
-            range: {
-                min: this.area.min,
-                max: this.area.max,
-            },
-        });
+        // Инициализация слайдеров
+        initRange(this.$refs.slider_room, this.slider);
+        initRange(this.$refs.slider_area, this.area);
         this.updateSlider();
-        this.setRefs();
-        // this.getPartArray();
     },
     // async created() {
     //     try {
@@ -463,8 +383,7 @@ export default {
                                         v-for="(item, index) in el"
                                         :item="item"
                                         :key="item.field_number"
-                                        :selectedRooms="selectedRooms"
-                                        :filteredRooms="filtered_rooms" />
+                                        :selectedRooms="selectedRooms" />
                                 </div>
                                 <div class="flat-list__plan">
                                     <a
@@ -501,38 +420,10 @@ export default {
                                 <div class="main-sale__filter-form-wrap">
                                     <form action="#">
                                         <div class="main-sale__filter-top">
-                                            <fieldset
-                                                class="main-sale__filter-rooms">
-                                                <legend>
-                                                    Количество комнат
-                                                </legend>
-                                                <ul>
-                                                    <li
-                                                        v-for="(
-                                                            checkbox, idx
-                                                        ) in listCheckboxes">
-                                                        <input
-                                                            :id="`rooms-${idx}`"
-                                                            type="checkbox"
-                                                            :value="
-                                                                checkbox.value
-                                                            "
-                                                            @change="
-                                                                updateScheme
-                                                            "
-                                                            v-model="
-                                                                selectedRooms
-                                                            "
-                                                            name="field_rooms_count[]" />
-                                                        <label
-                                                            :for="`rooms-${idx}`"
-                                                            >{{
-                                                                checkbox.value
-                                                            }}</label
-                                                        >
-                                                    </li>
-                                                </ul>
-                                            </fieldset>
+                                            <FieldRooms
+                                                @updateCheckboxes="
+                                                    updateCheckboxes
+                                                "></FieldRooms>
                                             <fieldset
                                                 class="main-sale__filter-price">
                                                 <legend>
