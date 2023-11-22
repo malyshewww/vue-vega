@@ -61,18 +61,28 @@ export default {
             return roomsCountStr;
         },
         setBlockedClass() {
-            if (this.selectedRooms.length) {
-                if (this.selectedRooms.includes(this.blockedRooms)) return;
-                return "filter-blocked";
+            if (this.selectedRooms.length > 0) {
+                if (
+                    !this.selectedRooms.includes(this.blockedRooms) ||
+                    this.item.newStatus == false
+                ) {
+                    return "filter-blocked";
+                }
+            } else if (this.selectedRooms.length == 0) {
+                if (this.item.newStatus == false) {
+                    return "filter-blocked";
+                }
+            } else {
+                return "";
             }
-            if (this.selectedRooms.length && this.item.newStatus == false) {
-                return "filter-blocked";
-            } else if (
-                this.selectedRooms.length == 0 &&
-                this.item.newStatus == false
-            ) {
-                return "filter-blocked";
-            }
+            // if (this.selectedRooms.length && this.item.newStatus == false) {
+            //     return "filter-blocked";
+            // } else if (
+            //     this.selectedRooms.length == 0 &&
+            //     this.item.newStatus == false
+            // ) {
+            //     return "filter-blocked";
+            // }
         },
     },
     mounted() {

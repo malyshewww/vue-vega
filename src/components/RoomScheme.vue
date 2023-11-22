@@ -95,9 +95,10 @@ export default {
             updateSliderArea(this.$refs.slider_area, this.area);
             this.$refs.slider_room.noUiSlider.on("change", (e) => {
                 this.filtered_rooms = [];
+                let arrTest = [];
                 let min = Math.round(e[0]);
                 let max = Math.round(e[1]);
-                this.newListRoom.filter((item) => {
+                this.newListRoom.map((item) => {
                     item.map((f, i) => {
                         if (f.field_status == "В продаже") {
                             if (
@@ -143,10 +144,8 @@ export default {
             });
         },
         watchRange(arr, min, max) {
-            let arrPrices = [];
-            let minPrice = null;
-            if (arr.length && this.selectedRooms.length) {
-                arr.filter((item) => {
+            if (arr.length && this.selectedRooms.length > 0) {
+                arr.map((item) => {
                     item.map((f, i) => {
                         if (f.field_status == "В продаже") {
                             if (
@@ -154,16 +153,16 @@ export default {
                                 +f.field_price <= max
                             ) {
                                 console.log(f);
-                                f.newStatus = "active";
+                                f.newStatus = true;
                                 // this.filtered_rooms.push(f);
                             } else {
-                                f.newStatus = "no-active";
+                                f.newStatus = false;
                             }
                         }
                     });
                 });
+            } else {
             }
-            console.log(this.newListRoom);
         },
         // Обновление range количества комнат при change slider_area
         updateRoomRange(arr) {
@@ -189,6 +188,17 @@ export default {
             this.slider.minRange = arrMinPrices.length
                 ? Math.min(...arrMinPrices)
                 : this.slider.startMin;
+            this.newListRoom.filter((item) => {
+                item.map((f, i) => {
+                    if (f.field_status == "В продаже") {
+                        if (+f.field_price >= this.slider.minRange) {
+                            f.newStatus = true;
+                        } else {
+                            f.newStatus = false;
+                        }
+                    }
+                });
+            });
         },
         updateMaxPrice(arr) {
             let arrMaxPrices = arr.flatMap((item, i) =>
@@ -230,6 +240,7 @@ export default {
             this.$refs.slider_room.noUiSlider.set([minValueRoom, maxValueRoom]);
             this.$refs.slider_area.noUiSlider.set([minValueArea, maxValueArea]);
         },
+        // Обновление слайдеров при клике на чекбоксы
         updateScheme(target) {
             console.log(target.value);
             this.newListRoom.map((item) => {
@@ -242,6 +253,7 @@ export default {
                         this.updateMaxPrice(this.arrPrices);
                         this.updateMinSquare(this.arrSquare);
                         this.updateMaxSquare(this.arrSquare);
+
                         this.setNewSliderValues();
                         if (target.checked) {
                             this.updateListRoom.push(f);
@@ -343,6 +355,7 @@ export default {
         initRange(this.$refs.slider_room, this.slider);
         initRange(this.$refs.slider_area, this.area);
         this.updateSlider();
+        this.getPartArray();
     },
     // async created() {
     //     try {
@@ -354,9 +367,7 @@ export default {
     //         this.errors.push(e);
     //     }
     // },
-    beforeMount() {
-        this.getPartArray();
-    },
+    beforeMount() {},
 };
 </script>
 <template>
@@ -383,7 +394,8 @@ export default {
                                         v-for="(item, index) in el"
                                         :item="item"
                                         :key="item.field_number"
-                                        :selectedRooms="selectedRooms" />
+                                        :selectedRooms="selectedRooms"
+                                        v-bind="item.newStatus" />
                                 </div>
                                 <div class="flat-list__plan">
                                     <a
