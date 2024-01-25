@@ -1,8 +1,9 @@
 <script>
 import noUiSlider from "nouislider";
 import axios from "axios";
+import { Fancybox } from "@fancyapps/ui";
 import json from "../data.json";
-import FlatItem from "./Rooms/FlatItem.vue";
+import FlatItem from "./Rooms/FlatSchemeItem.vue";
 // import FlatWindow from "./Rooms/FlatWindow.vue";
 // import { ref, onMounted, onUnmounted } from "vue";
 import NavigationBtn from "./NavigationBtn.vue";
@@ -12,6 +13,8 @@ import {
     updateSliderRoom,
     updateSliderArea,
     updateSquareRange,
+    updateMinSliderValue,
+    updateMaxSliderValue,
     setNewValue,
 } from "../helpers/utils.js";
 // Подключение компонента с чекбоксами
@@ -80,9 +83,42 @@ export default {
                 max: 72.35,
             },
             filtered_rooms: [],
+            testObj: {},
+            activeWindow: false,
+            tooltip: {
+                isActive: false,
+                img: "",
+                title: "",
+                price: "",
+                status: "",
+            },
         };
     },
+    mounted() {
+        Fancybox.bind(`[data-fancybox=""]`, {});
+    },
     methods: {
+        openTooltip(event, flat) {
+            let target = event.target;
+            this.tooltip.img = flat.field_plan_image;
+            this.tooltip.title = `${flat.field_rooms_count}-комнатная, ${flat.field_square} м²`;
+            this.tooltip.price = `${Number(flat.field_price).toLocaleString(
+                "ru-RU"
+            )} руб.`;
+            // this.tooltip.status =
+            //     flat.status === "on-sale" ? "в продаже" : "забронирована";
+            if (document.body.clientWidth > 1199) {
+                let left = target.getBoundingClientRect().left;
+                let top = target.getBoundingClientRect().top;
+                this.$refs.tooltip.style.left = `${left}px`;
+                this.$refs.tooltip.style.top = `${top}px`;
+                this.$refs.tooltip.style.transform = `translate(-43%, -110%)`;
+            }
+            this.tooltip.isActive = !this.isActive;
+        },
+        closeTooltip() {
+            this.tooltip.isActive = false;
+        },
         openFilter() {
             this.isActive = true;
         },
@@ -140,7 +176,6 @@ export default {
                 });
                 this.updateRoomRange(this.filtered_rooms);
                 setNewValue(this.$refs.slider_room, this.slider);
-                console.log(this.newListRoom);
             });
         },
         watchRange(arr, min, max) {
@@ -152,16 +187,13 @@ export default {
                                 +f.field_price >= min &&
                                 +f.field_price <= max
                             ) {
-                                console.log(f);
                                 f.newStatus = true;
-                                // this.filtered_rooms.push(f);
                             } else {
                                 f.newStatus = false;
                             }
                         }
                     });
                 });
-            } else {
             }
         },
         // Обновление range количества комнат при change slider_area
@@ -181,6 +213,7 @@ export default {
                 this.selectedRooms = [];
             }
         },
+        // Обновление минимальной цены
         updateMinPrice(arr) {
             let arrMinPrices = arr.flatMap((item, i) =>
                 this.selectedRooms.includes(item.room) ? [item.price] : []
@@ -200,30 +233,7 @@ export default {
                 });
             });
         },
-        updateMaxPrice(arr) {
-            let arrMaxPrices = arr.flatMap((item, i) =>
-                this.selectedRooms.includes(item.room) ? [item.price] : []
-            );
-            this.slider.maxRange = arrMaxPrices.length
-                ? Math.max(...arrMaxPrices)
-                : this.slider.startMax;
-        },
-        updateMinSquare(arr) {
-            let arrMinSquare = arr.flatMap((item) =>
-                this.selectedRooms.includes(item.room) ? [item.square] : []
-            );
-            this.area.minRange = arrMinSquare.length
-                ? Math.min(...arrMinSquare)
-                : this.area.startMin;
-        },
-        updateMaxSquare(arr) {
-            let arrMaxSquare = arr.flatMap((item) =>
-                this.selectedRooms.includes(item.room) ? [item.square] : []
-            );
-            this.area.maxRange = arrMaxSquare.length
-                ? Math.max(...arrMaxSquare)
-                : this.area.startMax;
-        },
+        // Проставление значений в слайдеры после того, как их обновили
         setNewSliderValues() {
             let minValueRoom = this.selectedRooms.length
                 ? this.slider.minRange
@@ -249,12 +259,6 @@ export default {
                         target.value == f.newRoom &&
                         f.field_status == "В продаже"
                     ) {
-                        this.updateMinPrice(this.arrPrices);
-                        this.updateMaxPrice(this.arrPrices);
-                        this.updateMinSquare(this.arrSquare);
-                        this.updateMaxSquare(this.arrSquare);
-
-                        this.setNewSliderValues();
                         if (target.checked) {
                             this.updateListRoom.push(f);
                             this.arrPrices.push({
@@ -275,9 +279,29 @@ export default {
                         }
                     }
                 });
+                updateMaxSliderValue(
+                    this.arrPrices,
+                    "area",
+                    this.slider,
+                    this.selectedRooms
+                );
+                updateMinSliderValue(
+                    this.arrSquare,
+                    "area",
+                    this.area,
+                    this.selectedRooms
+                );
+                updateMaxSliderValue(
+                    this.arrSquare,
+                    "area",
+                    this.area,
+                    this.selectedRooms
+                );
+                this.setNewSliderValues();
             });
-            console.log(this.updateListRoom);
+            // console.log(this.updateListRoom);
         },
+        // Разбиваем массивы на подмассивы для более корректного вывода шахватки квартир
         getPartArray() {
             let size = 9; // размер подмассива
             for (let i = 0; i < Math.ceil(this.info.length / size); i++) {
@@ -311,7 +335,7 @@ export default {
                     }
                 });
             });
-            console.log(this.newListRoom);
+            // console.log(this.newListRoom);
         },
         updateCheckboxes(target) {
             target.checked
@@ -395,15 +419,15 @@ export default {
                                         :item="item"
                                         :key="item.field_number"
                                         :selectedRooms="selectedRooms"
+                                        @openTooltip="openTooltip"
+                                        @closeTooltip="closeTooltip"
                                         v-bind="item.newStatus" />
                                 </div>
-                                <div class="flat-list__plan">
+                                <div class="flat-list__plan" ref="flat_plan">
                                     <a
                                         class="flat-list__link"
-                                        href="img/flat/img2.png"
-                                        :data-fancybox="`plan-floor-${
-                                            idx + 1
-                                        }`">
+                                        href="./assets/img/flat/img2.png"
+                                        :data-fancybox="`plan-floor${idx + 1}`">
                                         план этажа
                                     </a>
                                 </div>
@@ -566,6 +590,52 @@ export default {
                         </li>
                     </ul>
                 </div>
+            </div>
+        </div>
+        <div
+            class="flat-list__window"
+            ref="tooltip"
+            :class="{ active: tooltip.isActive }">
+            <div class="wrap">
+                <div class="flat-list__minImg">
+                    <picture>
+                        <source
+                            :srcset="`${tooltip.img}.webp`"
+                            type="image/webp" />
+                        <img :src="`${tooltip.img}.png`" alt="" />
+                    </picture>
+                </div>
+                <div class="flat-list__info">
+                    <span class="inf">{{ tooltip.title }} </span>
+                    <span class="price">{{ tooltip.price }} </span>
+                </div>
+                <a class="mob-btn btn" href="#">подробнее</a
+                ><svg
+                    width="8"
+                    height="5"
+                    viewBox="0 0 8 5"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="triangle">
+                    <path d="M8 0L4 5L0 0H8Z" fill="white" />
+                </svg>
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="mob-close">
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M5 6.45468L10.5317
+          11.9789L5 17.5119L6.28942 19L11.9259 13.371L17.5624 19L19
+          17.6599L13.32 11.9789L19 6.30663L17.4827 5.02675L11.926
+          10.5845L6.34248 5L5 6.45468Z"
+                        fill="#E1DCDE"
+                        class="mob-close2" />
+                </svg>
             </div>
         </div>
     </div>

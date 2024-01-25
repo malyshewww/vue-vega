@@ -9,6 +9,10 @@ import {
     updateSliderArea,
     updateSliderFloor,
     updateSquareRange,
+    updateFloorRange,
+    updateRoomRange,
+    updateMinSliderValue,
+    updateMaxSliderValue,
     setNewValue,
 } from "../helpers/utils.js";
 export default {
@@ -21,6 +25,10 @@ export default {
             dataList: json,
             selectedRooms: [],
             listCheckboxes: checkboxObj,
+            newListRoom: [],
+            arrPrices: [],
+            arrSquare: [],
+            arrFloor: [],
             slider: {
                 minRange: null,
                 maxRange: null,
@@ -59,7 +67,35 @@ export default {
                       this.selectedRooms.indexOf(target.value),
                       1
                   );
-            console.log(this.selectedRooms);
+            this.updateFlatList(target);
+        },
+        // Формирование нового массива с добавленим новых свойств
+        setNewArray() {
+            for (let i = 0; i < Math.ceil(this.dataList.length); i++) {
+                this.newListRoom = this.dataList;
+            }
+            this.newListRoom.map((elem, i) => {
+                elem.field_price = elem.field_price.replace("руб.", "").trim();
+                elem.field_floor_1 = elem.field_floor_1
+                    .split(" ")
+                    .find((x) => x == +x);
+                if (elem.field_rooms_count == "1" && elem.field_euro == "Да") {
+                    elem.newRoom = "1+";
+                } else if (
+                    elem.field_rooms_count == "2" &&
+                    elem.field_euro == "Да"
+                ) {
+                    elem.newRoom = "2+";
+                } else if (
+                    elem.field_rooms_count == "3" &&
+                    elem.field_euro == "Да"
+                ) {
+                    elem.newRoom = "3+";
+                } else if (elem.field_euro == "Нет") {
+                    elem.newRoom = elem.field_rooms_count;
+                }
+            });
+            // console.log(this.newListRoom);
         },
         updateSlider() {
             updateSliderRoom(this.$refs.slider_room, this.slider);
@@ -79,14 +115,142 @@ export default {
                             +item.field_price <= max
                         ) {
                             this.filtered_rooms.push(item);
-                        } else {
                         }
                     }
                 });
-                console.log(this.filtered_rooms);
+                updateSquareRange(this.filtered_rooms, this.area);
+                setNewValue(this.$refs.slider_area, this.area);
+                updateFloorRange(this.filtered_rooms, this.floor);
+                setNewValue(this.$refs.slider_floor, this.floor);
+            });
+            this.$refs.slider_area.noUiSlider.on("change", (e) => {
+                this.filtered_rooms = [];
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.dataList.map((item, i) => {
+                    if (item.field_status == "В продаже") {
+                        if (
+                            +item.field_square >= min &&
+                            +item.field_square <= max
+                        ) {
+                            this.filtered_rooms.push(item);
+                        }
+                    }
+                });
+                updateRoomRange(this.filtered_rooms, this.slider);
+                setNewValue(this.$refs.slider_room, this.slider);
+                updateFloorRange(this.filtered_rooms, this.floor);
+                setNewValue(this.$refs.slider_floor, this.floor);
+            });
+            this.$refs.slider_floor.noUiSlider.on("change", (e) => {
+                this.filtered_rooms = [];
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.dataList.map((item, i) => {
+                    if (item.field_status == "В продаже") {
+                        if (
+                            +item.field_floor_1 >= min &&
+                            +item.field_floor_1 <= max
+                        ) {
+                            this.filtered_rooms.push(item);
+                        }
+                    }
+                });
+                updateRoomRange(this.filtered_rooms, this.slider);
+                setNewValue(this.$refs.slider_room, this.slider);
                 updateSquareRange(this.filtered_rooms, this.area);
                 setNewValue(this.$refs.slider_area, this.area);
             });
+        },
+        updateFlatList(target) {
+            this.newListRoom.filter((f) => {
+                if (
+                    target.value == f.newRoom &&
+                    f.field_status == "В продаже"
+                ) {
+                    if (target.checked) {
+                        this.arrPrices.push({
+                            id: f.field_number,
+                            price: f.field_price,
+                            room: f.newRoom,
+                        });
+                        this.arrSquare.push({
+                            id: f.field_number,
+                            square: f.field_square,
+                            room: f.newRoom,
+                        });
+                        this.arrFloor.push({
+                            id: f.field_number,
+                            floor: f.field_floor_1,
+                            room: f.newRoom,
+                        });
+                    }
+                }
+            });
+            updateMinSliderValue(
+                this.arrPrices,
+                "room",
+                this.slider,
+                this.selectedRooms
+            );
+            updateMaxSliderValue(
+                this.arrPrices,
+                "room",
+                this.slider,
+                this.selectedRooms
+            );
+            updateMinSliderValue(
+                this.arrSquare,
+                "area",
+                this.area,
+                this.selectedRooms
+            );
+            updateMaxSliderValue(
+                this.arrSquare,
+                "area",
+                this.area,
+                this.selectedRooms
+            );
+            updateMinSliderValue(
+                this.arrFloor,
+                "floor",
+                this.floor,
+                this.selectedRooms
+            );
+            updateMaxSliderValue(
+                this.arrFloor,
+                "floor",
+                this.floor,
+                this.selectedRooms
+            );
+            this.setNewSliderValues();
+        },
+        // Проставление значений в слайдеры после того, как их обновили
+        setNewSliderValues() {
+            let minValueRoom = this.selectedRooms.length
+                ? this.slider.minRange
+                : this.slider.startMin;
+            let maxValueRoom = this.selectedRooms.length
+                ? this.slider.maxRange
+                : this.slider.startMax;
+            let minValueArea = this.selectedRooms.length
+                ? this.area.minRange
+                : this.area.startMin;
+            let maxValueArea = this.selectedRooms.length
+                ? this.area.maxRange
+                : this.area.startMax;
+            let minValueFloor = this.selectedRooms.length
+                ? this.floor.minRange
+                : this.floor.startMin;
+            let maxValueFloor = this.selectedRooms.length
+                ? this.floor.maxRange
+                : this.floor.startMax;
+            this.$refs.slider_room.noUiSlider.set([minValueRoom, maxValueRoom]);
+            this.$refs.slider_area.noUiSlider.set([minValueArea, maxValueArea]);
+            this.$refs.slider_floor.noUiSlider.set([
+                minValueFloor,
+                maxValueFloor,
+            ]);
         },
     },
     mounted() {
@@ -95,7 +259,7 @@ export default {
         initRange(this.$refs.slider_area, this.area);
         initRange(this.$refs.slider_floor, this.floor);
         this.updateSlider();
-        console.log(this.dataList);
+        this.setNewArray();
     },
 };
 </script>

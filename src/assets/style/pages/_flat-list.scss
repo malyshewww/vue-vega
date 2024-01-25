@@ -78,8 +78,8 @@
     &__rooms {
         display: flex;
         gap: 8px;
-        position: relative;
-        z-index: 2;
+        // position: relative;
+        // z-index: 2;
     }
     &__room {
         width: 40px;
@@ -94,6 +94,8 @@
         font-weight: 500;
         font-size: 14px;
         transition: background-color 0.3s;
+        position: relative;
+        z-index: 2;
         &.soldOut {
             background-color: #ffffff;
         }

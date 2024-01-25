@@ -12,6 +12,7 @@
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
+    "@fancyapps/ui": "^5.0.33",
     "@vitejs/plugin-vue": "^4.4.0",
     "axios": "^1.6.0",
     "nouislider": "^15.7.1",
