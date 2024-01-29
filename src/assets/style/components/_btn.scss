@@ -1,138 +1,141 @@
 // Стили кнопок
 button,
-input{
-	outline: none;
-	border-radius: 0;
-	padding: 0;
-	background-color: transparent;
-	border: 0;
+input {
+    outline: none;
+    border-radius: 0;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
 }
 button,
-input[type="submit"]{
-	cursor: pointer;
+input[type="submit"] {
+    cursor: pointer;
 }
-.btn{
-	&,
-	&-light,
-	&-dark,
-	&-border{
-		height: 52px;
-		width: fit-content;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-family: $font;
-		font-weight: 500;
-		font-size: 16px;
-		line-height: 1.25;
-		letter-spacing: 0.02em;
-		color: #fff;
-		border: 0;
-		border-radius: 4px;
-		// padding: 17px 35px 15px;
-		padding: 0 35px;
-		cursor: pointer;
-		transition: background-color $time, box-shadow $time, border-color $time, color $time;
-		&:focus{
-			box-shadow: 0px 0px 8px $blue-light;
-			outline: none;
-		}
-		&:disabled{
-			background-color: $beige;
-		}
-		@media (max-width: 479px) {
-			height: 42px;
-			padding: 0 20px;
-		}
-	}
-	&{
-		background-color: $blue-medium;
-		&:hover{
-			background-color: $blue-medium-hover;
-		}
-	}
-	&-light{
-		background-color: $blue-light;
-		&:hover{
-			background-color: $blue-light-hover;
-		}
-	}
-	&-dark{
-		background-color: $blue-dark;
-		&:hover{
-			background-color: $blue-dark-hover;
-		}
-	}
-	&-border{
-		background-color: transparent;
-		border: 1px solid $blue-lightest;
-		color: $blue-medium;
-		&:hover{
-			border-color: $blue-medium;
-		}
-		&:focus{
-			color: $blue-dark;
-		}
-		&:disabled{
-			border-color: $beige;
-			color: $beige;
-			background-color: transparent;
-		}
-	}
-	@media (max-width: 767px) {
-		.btn:hover{
-			background-color: $blue-medium
-		}
-		.btn-light:hover{
-			background-color: $blue-light;
-		}
-		.btn-dark:hover{
-			background-color: $blue-dark;
-		}
-		.btn-border:hover{
-			border: 1px solid $blue-lightest;
-		}
-	}
-	&-arrow{
-		width: fit-content;
-		position: relative;
-		color: $blue-medium;
-		letter-spacing: 0.01em;
-		font-size: 16px;
-		font-weight: 500;
-		display: flex;
-		align-items: center;
-		gap: 6px;
-
-		&::after{
-			content: '';
-			display: inline-block;
-			width: 20px;
-			// width: 15px;
-			height: 8px;
-			mask-image: url(../img/icons/arrow.svg);
-			mask-size: cover;
-			mask-repeat: no-repeat;
-			mask-position: right;
-			background-color: $blue-medium;
-			transition: transform $time;
-			// margin-left: 4px;
-			transform: translate(1px, 0px) $time;
-		}
-		&:hover{
-			color: $blue-dark;
-			// &::after{
-			// 	width: 20px;
-			// 	background-color: $blue-dark;
-			// }
-			&::after{
-				transform: translate(1px, 10px);
-				background-color: $blue-dark;
-			}
-			&::before{
-				border-color: $blue-dark;
-			}
-		}
-	}
+.btn {
+    &,
+    &-light,
+    &-dark,
+    &-border {
+        height: 52px;
+        width: fit-content;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: $font;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 1.25;
+        letter-spacing: 0.02em;
+        color: #fff;
+        border: 0;
+        border-radius: 4px;
+        // padding: 17px 35px 15px;
+        padding: 0 35px;
+        cursor: pointer;
+        transition: background-color $time, box-shadow $time, border-color $time,
+            color $time;
+        &:focus {
+            box-shadow: 0px 0px 8px $blue-light;
+            outline: none;
+        }
+        &:disabled {
+            background-color: $beige;
+        }
+        @media (max-width: 479px) {
+            height: 42px;
+            padding: 0 20px;
+        }
+    }
+    & {
+        background-color: $blue-medium;
+        &:hover {
+            background-color: $blue-medium-hover;
+        }
+    }
+    &-light {
+        background-color: $blue-light;
+        &:hover {
+            background-color: $blue-light-hover;
+        }
+    }
+    &-dark {
+        background-color: $blue-dark;
+        &:hover {
+            background-color: $blue-dark-hover;
+        }
+    }
+    &-border {
+        background-color: transparent;
+        border: 1px solid $blue-lightest;
+        color: $blue-medium;
+        &:hover {
+            border-color: $blue-medium;
+        }
+        &:focus {
+            color: $blue-dark;
+        }
+        &:disabled {
+            border-color: $beige;
+            color: $beige;
+            background-color: transparent;
+        }
+    }
+    @media (max-width: 767px) {
+        .btn:hover {
+            background-color: $blue-medium;
+        }
+        .btn-light:hover {
+            background-color: $blue-light;
+        }
+        .btn-dark:hover {
+            background-color: $blue-dark;
+        }
+        .btn-border:hover {
+            border: 1px solid $blue-lightest;
+        }
+    }
+    &-arrow {
+        width: fit-content;
+        position: relative;
+        color: $blue-medium;
+        letter-spacing: 0.01em;
+        font-size: 16px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        &::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            // width: 15px;
+            height: 8px;
+            mask-image: url("../img/icons/arrow.svg");
+            -webkit-mask-image: url("../img/icons/arrow.svg");
+            mask-size: cover;
+            -webkit-mask-size: cover;
+            mask-repeat: no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            mask-position: right;
+            -webkit-mask-position: right;
+            background-color: $blue-medium;
+            transition: transform $time;
+            // margin-left: 4px;
+            transform: translate(1px, 0px) $time;
+        }
+        &:hover {
+            color: $blue-dark;
+            // &::after{
+            // 	width: 20px;
+            // 	background-color: $blue-dark;
+            // }
+            &::after {
+                transform: translate(1px, 10px);
+                background-color: $blue-dark;
+            }
+            &::before {
+                border-color: $blue-dark;
+            }
+        }
+    }
 }
-

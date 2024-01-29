@@ -2,6 +2,7 @@
 import NavigationBtn from "./NavigationBtn.vue";
 import FieldRooms from "./FieldRooms.vue";
 import json from "../data.json";
+import FlatListItem from "./FlatListItem.vue";
 import {
     checkboxObj,
     initRange,
@@ -19,9 +20,11 @@ export default {
     components: {
         NavigationBtn,
         FieldRooms,
+        FlatListItem,
     },
     data() {
         return {
+            isActive: false,
             dataList: json,
             selectedRooms: [],
             listCheckboxes: checkboxObj,
@@ -252,6 +255,15 @@ export default {
                 maxValueFloor,
             ]);
         },
+        openFilter() {
+            this.isActive = true;
+        },
+        closeFilter() {
+            this.isActive = false;
+        },
+        resetFilter() {
+            window.location.reload();
+        },
     },
     mounted() {
         // Инициализация слайдеров
@@ -260,6 +272,7 @@ export default {
         initRange(this.$refs.slider_floor, this.floor);
         this.updateSlider();
         this.setNewArray();
+        document.body.classList.add("not-front");
     },
 };
 </script>
@@ -269,11 +282,18 @@ export default {
             <div class="main-sale__filter">
                 <div class="container">
                     <NavigationBtn></NavigationBtn>
-                    <button class="main-sale__filter-btn btn">фильтр</button>
-                    <div class="main-sale__filter-wrap">
+                    <button
+                        class="main-sale__filter-btn btn"
+                        @click="openFilter()">
+                        фильтр
+                    </button>
+                    <div
+                        class="main-sale__filter-wrap"
+                        :class="{ open: isActive }">
                         <div class="wrapper-top">
                             <div
-                                class="wrapper-close main-sale__filter-close"></div>
+                                class="wrapper-close main-sale__filter-close"
+                                @click="closeFilter()"></div>
                             <h3 class="wrapper-title">Фильтр</h3>
                         </div>
                         <div class="main-sale__filter-form-wrap">
@@ -396,7 +416,8 @@ export default {
                                         </ul>
                                     </fieldset> -->
                                     <div
-                                        class="main-sale__filter-reset btn-border">
+                                        class="main-sale__filter-reset btn-border"
+                                        @click="resetFilter()">
                                         сбросить фильтр
                                     </div>
                                 </div>
@@ -409,516 +430,7 @@ export default {
                 </div>
             </div>
             <div class="container">
-                <ul class="main-sale__list">
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/1-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/1-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/1-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/1-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    1-комнатная 45,20 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>4 400 350 руб.</span
-                                    ><span>2 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>французский балкон</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/2-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/2-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/2-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/2-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    2-комнатная 61,75 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>7 080 000 руб.</span
-                                    ><span>4 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>лоджия</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/3-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/3-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/3-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/3-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    3-комнатная 83,10 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>13 580 600 руб.</span
-                                    ><span>12 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild"></div
-                        ></a>
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/1-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/1-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/1-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/1-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    1-комнатная 45,20 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>4 400 350 руб.</span
-                                    ><span>2 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>французский балкон</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/2-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/2-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/2-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/2-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    2-комнатная 61,75 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>7 080 000 руб.</span
-                                    ><span>4 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>лоджия</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/3-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/3-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/3-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/3-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    3-комнатная 83,10 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>13 580 600 руб.</span
-                                    ><span>12 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild"></div
-                        ></a>
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/1-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/1-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/1-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/1-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    1-комнатная 45,20 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>4 400 350 руб.</span
-                                    ><span>2 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>французский балкон</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/2-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/2-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/2-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/2-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    2-комнатная 61,75 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>7 080 000 руб.</span
-                                    ><span>4 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>лоджия</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/3-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/3-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/3-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/3-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    3-комнатная 83,10 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>13 580 600 руб.</span
-                                    ><span>12 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild"></div
-                        ></a>
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/1-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/1-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/1-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/1-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    1-комнатная 45,20 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>4 400 350 руб.</span
-                                    ><span>2 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>французский балкон</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/2-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/2-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/2-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/2-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    2-комнатная 61,75 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>7 080 000 руб.</span
-                                    ><span>4 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild">
-                                <span>лоджия</span>
-                            </div></a
-                        >
-                    </li>
-                    <li class="main-sale__item">
-                        <a href="flat-item.html">
-                            <div class="main-sale__item-img swiper">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide img-flat">
-                                        <picture
-                                            ><source
-                                                srcset="img/index/3-k.webp"
-                                                type="image/webp" />
-                                            <img src="img/index/3-k.png" alt=""
-                                        /></picture>
-                                    </div>
-                                    <div class="swiper-slide img-location">
-                                        <picture
-                                            ><source
-                                                srcset="
-                                                    img/index/3-k-scheme.webp
-                                                "
-                                                type="image/webp" />
-                                            <img
-                                                src="img/index/3-k-scheme.png"
-                                                alt=""
-                                        /></picture>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="main-sale__item-content">
-                                <div class="main-sale__item-title">
-                                    3-комнатная 83,10 м²
-                                </div>
-                                <div class="main-sale__item-text">
-                                    <span>13 580 600 руб.</span
-                                    ><span>12 этаж</span>
-                                </div>
-                                <div class="main-sale__item-link btn-arrow">
-                                    подробнее
-                                </div>
-                            </div>
-                            <div class="main-sale__item-schild"></div
-                        ></a>
-                    </li>
-                </ul>
+                <FlatListItem :list="dataList"></FlatListItem>
                 <button class="main-sale__show-more">показать ещё</button>
             </div>
         </div>

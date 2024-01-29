@@ -9,7 +9,15 @@ import RoomList from "./components/RoomList.vue";
 export default createRouter({
     history: createWebHistory(),
     routes: [
-        { path: "/scheme", component: RoomScheme, alias: "/" },
-        { path: "/list", component: RoomList },
+        {
+            path: "/scheme",
+            component: RoomScheme,
+            alias: "/",
+        },
+        {
+            path: "/list",
+            component: RoomList,
+            alias: "/",
+        },
     ],
 });

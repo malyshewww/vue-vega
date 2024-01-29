@@ -82,7 +82,8 @@ body.front {
     background-color: $beige-light;
 }
 body.not-front {
-    padding-top: $headerHeight;
+    // padding-top: $headerHeight;
+    padding-top: 120px;
     background-color: $beige-light;
     @media (max-width: 639px) {
         padding-top: $headerHeightPhone;

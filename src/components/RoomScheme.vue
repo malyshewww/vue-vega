@@ -2,11 +2,13 @@
 import noUiSlider from "nouislider";
 import axios from "axios";
 import { Fancybox } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import json from "../data.json";
-import FlatItem from "./Rooms/FlatSchemeItem.vue";
+import FlatItem from "./FlatSchemeItem.vue";
 // import FlatWindow from "./Rooms/FlatWindow.vue";
 // import { ref, onMounted, onUnmounted } from "vue";
 import NavigationBtn from "./NavigationBtn.vue";
+import { useFetch } from "../fetch.js";
 import {
     initRange,
     checkboxObj,
@@ -25,6 +27,7 @@ export default {
         FlatItem,
         NavigationBtn,
         FieldRooms,
+        Fancybox,
     },
     // provide() {
     //     return {
@@ -95,7 +98,11 @@ export default {
         };
     },
     mounted() {
-        Fancybox.bind(`[data-fancybox=""]`, {});
+        // Fancybox.bind(`[data-fancybox=""]`, {});
+        Fancybox.bind("[data-fancybox^='gallery']", {
+            hideScrollbar: false,
+            Hash: false,
+        });
     },
     methods: {
         openTooltip(event, flat) {
@@ -380,6 +387,9 @@ export default {
         initRange(this.$refs.slider_area, this.area);
         this.updateSlider();
         this.getPartArray();
+        document.body.classList.add("not-front");
+        const { data, error } = useFetch(() => console.log("fetch"));
+        console.log(data, error);
     },
     // async created() {
     //     try {
@@ -423,11 +433,11 @@ export default {
                                         @closeTooltip="closeTooltip"
                                         v-bind="item.newStatus" />
                                 </div>
-                                <div class="flat-list__plan" ref="flat_plan">
+                                <div class="flat-list__plan">
                                     <a
                                         class="flat-list__link"
                                         href="./assets/img/flat/img2.png"
-                                        :data-fancybox="`plan-floor${idx + 1}`">
+                                        data-fancybox="gallery">
                                         план этажа
                                     </a>
                                 </div>
