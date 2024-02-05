@@ -5,9 +5,8 @@ import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import json from "../data.json";
 import FlatItem from "./FlatSchemeItem.vue";
-// import FlatWindow from "./Rooms/FlatWindow.vue";
-// import { ref, onMounted, onUnmounted } from "vue";
 import NavigationBtn from "./NavigationBtn.vue";
+import FieldRooms from "./FieldRooms.vue";
 import { useFetch } from "../fetch.js";
 import {
     initRange,
@@ -20,7 +19,6 @@ import {
     setNewValue,
 } from "../helpers/utils.js";
 // Подключение компонента с чекбоксами
-import FieldRooms from "./FieldRooms.vue";
 export default {
     components: {
         noUiSlider,
@@ -29,11 +27,6 @@ export default {
         FieldRooms,
         Fancybox,
     },
-    // provide() {
-    //     return {
-    //         todoLength: this.$refs.length,
-    //     };
-    // },
     data() {
         return {
             errors: [],
@@ -75,6 +68,8 @@ export default {
                 step: 10000, // 10000
                 min: 5000000,
                 max: 13500000,
+                newMinValue: null,
+                newMaxValue: null,
             },
             area: {
                 minRange: null,
@@ -84,6 +79,8 @@ export default {
                 step: 0.1,
                 min: 35.95,
                 max: 72.35,
+                newMinValue: null,
+                newMaxValue: null,
             },
             filtered_rooms: [],
             testObj: {},
@@ -95,14 +92,13 @@ export default {
                 price: "",
                 status: "",
             },
+            hiddenInputs: {
+                price: "",
+                area: "",
+            },
+            refsCheckboxes: [],
+            refsSchemeItems: [],
         };
-    },
-    mounted() {
-        // Fancybox.bind(`[data-fancybox=""]`, {});
-        Fancybox.bind("[data-fancybox^='gallery']", {
-            hideScrollbar: false,
-            Hash: false,
-        });
     },
     methods: {
         openTooltip(event, flat) {
@@ -138,9 +134,11 @@ export default {
             updateSliderArea(this.$refs.slider_area, this.area);
             this.$refs.slider_room.noUiSlider.on("change", (e) => {
                 this.filtered_rooms = [];
-                let arrTest = [];
                 let min = Math.round(e[0]);
                 let max = Math.round(e[1]);
+                this.slider.newMinValue = min;
+                this.slider.newMaxValue = max;
+                console.log(this.slider.newMinValue);
                 this.newListRoom.map((item) => {
                     item.map((f, i) => {
                         if (f.field_status == "В продаже") {
@@ -161,11 +159,16 @@ export default {
                 updateSquareRange(this.filtered_rooms, this.area);
                 setNewValue(this.$refs.slider_area, this.area);
                 this.watchRange(this.newListRoom, min, max);
+                // console.log(this.filtered_rooms);
+                this.checkFilteredData();
+                console.log(this.filtered_rooms);
             });
             this.$refs.slider_area.noUiSlider.on("change", (e) => {
                 this.filtered_rooms = [];
                 let min = Math.round(e[0]);
                 let max = Math.round(e[1]);
+                this.area.newMinValue = min;
+                this.area.newMaxValue = max;
                 this.newListRoom.filter((item) => {
                     item.map((f, i) => {
                         if (f.field_status == "В продаже") {
@@ -183,7 +186,20 @@ export default {
                 });
                 this.updateRoomRange(this.filtered_rooms);
                 setNewValue(this.$refs.slider_room, this.slider);
+                this.checkFilteredData();
             });
+        },
+        checkFilteredData() {
+            if (this.filtered_rooms.length > 0) {
+                return true;
+            } else {
+                [...this.refsCheckboxes].forEach((checkbox) => {
+                    {
+                        checkbox.checked = false;
+                        this.selectedRooms = [];
+                    }
+                });
+            }
         },
         watchRange(arr, min, max) {
             if (arr.length && this.selectedRooms.length > 0) {
@@ -257,9 +273,22 @@ export default {
             this.$refs.slider_room.noUiSlider.set([minValueRoom, maxValueRoom]);
             this.$refs.slider_area.noUiSlider.set([minValueArea, maxValueArea]);
         },
+        // Обновление схемы при клике на чекбоксы
+        updateCheckboxes(target) {
+            target.checked
+                ? this.selectedRooms.push(target.value)
+                : this.selectedRooms.splice(
+                      this.selectedRooms.indexOf(target.value),
+                      1
+                  );
+            this.updateScheme(target);
+            this.getArrCheckboxes(this.refsCheckboxes);
+        },
+        getArrCheckboxes(arr) {
+            this.refsCheckboxes = arr;
+        },
         // Обновление слайдеров при клике на чекбоксы
         updateScheme(target) {
-            console.log(target.value);
             this.newListRoom.map((item) => {
                 item.filter((f, i) => {
                     if (
@@ -286,9 +315,11 @@ export default {
                         }
                     }
                 });
+                this.updateMinPrice(this.arrPrices);
+                // Использование функций из helpers/utils
                 updateMaxSliderValue(
                     this.arrPrices,
-                    "area",
+                    "room",
                     this.slider,
                     this.selectedRooms
                 );
@@ -304,9 +335,22 @@ export default {
                     this.area,
                     this.selectedRooms
                 );
+
                 this.setNewSliderValues();
             });
             // console.log(this.updateListRoom);
+        },
+        updateInputsHidden() {
+            this.$refs.slider_room.noUiSlider.on("update", (e) => {
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.hiddenInputs.price = `${min}_${max}`;
+            });
+            this.$refs.slider_area.noUiSlider.on("update", (e) => {
+                let min = e[0];
+                let max = e[1];
+                this.hiddenInputs.area = `${min}_${max}`;
+            });
         },
         // Разбиваем массивы на подмассивы для более корректного вывода шахватки квартир
         getPartArray() {
@@ -342,54 +386,21 @@ export default {
                     }
                 });
             });
-            // console.log(this.newListRoom);
-        },
-        updateCheckboxes(target) {
-            target.checked
-                ? this.selectedRooms.push(target.value)
-                : this.selectedRooms.splice(
-                      this.selectedRooms.indexOf(target.value),
-                      1
-                  );
-            this.updateScheme(target);
         },
     },
     computed: {},
-    watch: {
-        addBodyClass: {
-            immediate: true,
-            handler(val) {
-                document.body.classList.toggle("not-front", val);
-            },
-        },
-        setNewRange() {
-            this.$refs?.slider_room.noUiSlider.on(
-                "update",
-                (e, values, handle) => {
-                    let min = Math.round(e[0]);
-                    let max = Math.round(e[1]);
-                    if (!isNaN(min) && !isNaN(max)) {
-                        // this[handle ? "maxRange" : "minRange"] = parseInt(values[handle]);
-                        this.slider.minRange = new Intl.NumberFormat(
-                            "ru-RU"
-                        ).format(min);
-                        this.slider.maxRange = new Intl.NumberFormat(
-                            "ru-RU"
-                        ).format(max);
-                    }
-                }
-            );
-        },
-    },
+    watch: {},
     mounted() {
         // Инициализация слайдеров
         initRange(this.$refs.slider_room, this.slider);
         initRange(this.$refs.slider_area, this.area);
         this.updateSlider();
         this.getPartArray();
+        this.updateInputsHidden();
         document.body.classList.add("not-front");
+        console.log(this.newListRoom);
         const { data, error } = useFetch(() => console.log("fetch"));
-        console.log(data, error);
+        // console.log(data, error);
     },
     // async created() {
     //     try {
@@ -401,7 +412,9 @@ export default {
     //         this.errors.push(e);
     //     }
     // },
-    beforeMount() {},
+    beforeMount() {
+        Fancybox.bind("[data-fancybox^='gallery']", {});
+    },
 };
 </script>
 <template>
@@ -431,14 +444,22 @@ export default {
                                         :selectedRooms="selectedRooms"
                                         @openTooltip="openTooltip"
                                         @closeTooltip="closeTooltip"
+                                        :sliderMinValue="slider.newMinValue"
+                                        :sliderMaxValue="slider.newMaxValue"
+                                        :areaMinValue="area.newMinValue"
+                                        :areaMaxValue="area.newMaxValue"
                                         v-bind="item.newStatus" />
                                 </div>
                                 <div class="flat-list__plan">
                                     <a
                                         class="flat-list__link"
-                                        href="./assets/img/flat/img2.png"
-                                        data-fancybox="gallery">
+                                        href="./src/assets/img/flat/img2.png"
+                                        :data-fancybox="`gallery-${idx}`">
                                         план этажа
+                                        <img
+                                            style="display: none"
+                                            src="./src/assets/img/flat/img2.png"
+                                            alt="" />
                                     </a>
                                 </div>
                             </div>
@@ -469,6 +490,9 @@ export default {
                                             <FieldRooms
                                                 @updateCheckboxes="
                                                     updateCheckboxes
+                                                "
+                                                @getArrCheckboxes="
+                                                    getArrCheckboxes
                                                 "></FieldRooms>
                                             <fieldset
                                                 class="main-sale__filter-price">
@@ -476,6 +500,12 @@ export default {
                                                     Количество комнат
                                                 </legend>
                                                 <div class="filter-slider">
+                                                    <input
+                                                        type="hidden"
+                                                        name="field_price"
+                                                        :value="
+                                                            hiddenInputs.price
+                                                        " />
                                                     <div
                                                         class="filter-slider-top">
                                                         <span
@@ -511,6 +541,12 @@ export default {
                                                     Площадь квартиры (м²)
                                                 </legend>
                                                 <div class="filter-slider">
+                                                    <input
+                                                        type="hidden"
+                                                        name="field_square"
+                                                        :value="
+                                                            hiddenInputs.area
+                                                        " />
                                                     <div
                                                         class="filter-slider-top">
                                                         <span

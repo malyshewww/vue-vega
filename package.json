@@ -1,24 +1,26 @@
 {
-  "name": "vue-project",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.5"
-  },
-  "devDependencies": {
-    "@fancyapps/ui": "^5.0.33",
-    "@vitejs/plugin-vue": "^4.4.0",
-    "axios": "^1.6.0",
-    "nouislider": "^15.7.1",
-    "sass": "^1.69.5",
-    "sass-loader": "^13.3.2",
-    "vite": "^4.5.0",
-    "vue3-nouislider": "^1.0.0"
-  }
+    "name": "vue-project",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@fancyapps/ui": "^5.0.33",
+        "vue": "^3.3.4",
+        "vue-lazyload": "^3.0.0",
+        "vue-router": "^4.2.5",
+        "vue3-lazyload": "^0.3.8"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^4.4.0",
+        "axios": "^1.6.0",
+        "nouislider": "^15.7.1",
+        "sass": "^1.69.5",
+        "sass-loader": "^13.3.2",
+        "vite": "^4.5.0",
+        "vue3-nouislider": "^1.0.0"
+    }
 }

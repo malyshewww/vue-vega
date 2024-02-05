@@ -1,12 +1,19 @@
 <script>
-import { Fancybox } from "@fancyapps/ui";
 import FlatWindow from "./FlatWindow.vue";
 
 export default {
     components: {
         FlatWindow,
     },
-    props: ["item", "selectedRooms", "filteredRooms"],
+    props: [
+        "item",
+        "selectedRooms",
+        "filteredRooms",
+        "sliderMinValue",
+        "sliderMaxValue",
+        "areaMinValue",
+        "areaMaxValue",
+    ],
     data() {
         return {};
     },
@@ -53,10 +60,17 @@ export default {
                 ) {
                     return "filter-blocked";
                 }
-            } else if (this.selectedRooms.length == 0) {
-                if (this.item.newStatus == false) {
-                    return "filter-blocked";
-                }
+            } else if (
+                (this.selectedRooms.length == 0 &&
+                    this.sliderMinValue != null &&
+                    this.item.newStatus == false) ||
+                (this.sliderMaxValue != null && this.item.newStatus == false) ||
+                (this.areaMinValue != null && this.item.newStatus == false) ||
+                (this.areaMaxValue != null && this.item.newStatus == false)
+            ) {
+                // if (this.item.newStatus == false) {
+                return "filter-blocked";
+                // }
             } else {
                 return "";
             }
@@ -75,6 +89,7 @@ export default {
 </script>
 <template>
     <a
+        ref="schemeItem"
         class="flat-list__room"
         :class="[
             addClass ? addClass : '',

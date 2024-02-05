@@ -12,10 +12,11 @@ export default {
     methods: {
         updateCheckboxes(e) {
             this.$emit("updateCheckboxes", e.target);
+            this.$emit("getArrCheckboxes", this.$refs.inputCheck);
         },
-        // selectedRooms() {
-        //     this.$emit("countSelectedRooms", this.value);
-        // },
+    },
+    mounted() {
+        this.$emit("getArrCheckboxes", this.$refs.inputCheck);
     },
 };
 </script>
@@ -25,6 +26,7 @@ export default {
         <ul>
             <li v-for="(checkbox, index) in listCheckboxes">
                 <input
+                    ref="inputCheck"
                     :id="`rooms-${index}`"
                     type="checkbox"
                     :value="checkbox.value"

@@ -40,6 +40,8 @@ export default {
                 step: 10000, // 10000
                 min: 5000000,
                 max: 13500000,
+                newMinValue: null,
+                newMaxValue: null,
             },
             area: {
                 minRange: null,
@@ -49,6 +51,8 @@ export default {
                 step: 0.1,
                 min: 35.95,
                 max: 72.35,
+                newMinValue: null,
+                newMaxValue: null,
             },
             floor: {
                 minRange: null,
@@ -58,8 +62,24 @@ export default {
                 step: 1,
                 min: 2,
                 max: 15,
+                newMinValue: null,
+                newMaxValue: null,
             },
             filtered_rooms: [],
+            flatsToShow: 12,
+            initialFlatsToShow: 12,
+            totalFlats: 0,
+            pageNumber: 1,
+            newShow: 0,
+            hiddenInputs: {
+                price: "",
+                area: "",
+                floor: "",
+            },
+            refsCheckboxes: [],
+            result: [],
+            resultState: false,
+            validStatus: false,
         };
     },
     methods: {
@@ -71,11 +91,50 @@ export default {
                       1
                   );
             this.updateFlatList(target);
+            this.updateNewValuesSlider();
+            // Обходим массива через map для создания нового свойства newStatus у каждого элемента массива
+            this.filtered_rooms.map((item, index) => {
+                let tempStatus = "";
+                if (item.field_status == "В продаже") {
+                    if (this.selectedRooms.includes(item.newRoom)) {
+                        tempStatus = true;
+                    } else {
+                        tempStatus = false;
+                    }
+                }
+                item.newStatus = tempStatus;
+            });
+            // Отбираем из массива только те объекты, у которых newStatus статус равен true
+            this.result = this.filtered_rooms.filter((item) => {
+                return Boolean(item.newStatus);
+            });
+            /*
+            Доп. проверка для дальнейшего взаимодействия с переменной validStatus
+            Проверка, содержит ли свойство элементов массива newStatus значение true 
+            */
+            this.validStatus = this.result.every(function (x) {
+                return x.newStatus == true;
+            });
+            if (this.result.length > 0 && this.validStatus) {
+                this.resultState = true;
+            } else {
+                this.resultState = false;
+                this.result = this.filtered_rooms;
+            }
+            // Количество карточек для показа, если работает с массивом result
+            if (this.result.length < 12) {
+                this.flatsToShow = this.result.length;
+            } else {
+                this.flatsToShow = 12;
+            }
+        },
+        getArrCheckboxes(arr) {
+            this.refsCheckboxes = arr;
         },
         // Формирование нового массива с добавленим новых свойств
         setNewArray() {
             for (let i = 0; i < Math.ceil(this.dataList.length); i++) {
-                this.newListRoom = this.dataList;
+                this.newListRoom = [...this.dataList];
             }
             this.newListRoom.map((elem, i) => {
                 elem.field_price = elem.field_price.replace("руб.", "").trim();
@@ -98,72 +157,189 @@ export default {
                     elem.newRoom = elem.field_rooms_count;
                 }
             });
-            // console.log(this.newListRoom);
+            this.filtered_rooms = this.newListRoom;
         },
         updateSlider() {
             updateSliderRoom(this.$refs.slider_room, this.slider);
             updateSliderArea(this.$refs.slider_area, this.area);
             updateSliderFloor(this.$refs.slider_floor, this.floor);
             this.$refs.slider_room.noUiSlider.on("change", (e) => {
-                this.filtered_rooms = [];
-                let min = Math.round(e[0]);
-                let max = Math.round(e[1]);
-                this.dataList.map((item, i) => {
-                    item.field_price = item.field_price
-                        .replace("руб.", "")
-                        .trim();
-                    if (item.field_status == "В продаже") {
-                        if (
-                            +item.field_price >= min &&
-                            +item.field_price <= max
-                        ) {
-                            this.filtered_rooms.push(item);
+                if (
+                    this.result.length == 0 &&
+                    !this.resultState &&
+                    !this.validStatus
+                ) {
+                    this.filtered_rooms = [];
+                    let min = Math.round(e[0]);
+                    let max = Math.round(e[1]);
+                    this.newListRoom.filter((item, i) => {
+                        if (item.field_status == "В продаже") {
+                            if (
+                                +item.field_price >= min &&
+                                +item.field_price <= max
+                            ) {
+                                this.filtered_rooms.push(item);
+                            }
                         }
-                    }
-                });
-                updateSquareRange(this.filtered_rooms, this.area);
-                setNewValue(this.$refs.slider_area, this.area);
-                updateFloorRange(this.filtered_rooms, this.floor);
-                setNewValue(this.$refs.slider_floor, this.floor);
+                    });
+                    updateSquareRange(this.filtered_rooms, this.area);
+                    setNewValue(this.$refs.slider_area, this.area);
+                    updateFloorRange(this.filtered_rooms, this.floor);
+                    setNewValue(this.$refs.slider_floor, this.floor);
+                    this.updateInputsHidden();
+                    this.checkFilteredData();
+                    this.setValuesForFlatsToShow();
+                } else {
+                    this.result = [];
+                    let min = Math.round(e[0]);
+                    let max = Math.round(e[1]);
+                    this.newListRoom.filter((item, i) => {
+                        if (item.field_status == "В продаже") {
+                            if (
+                                +item.field_price >= min &&
+                                +item.field_price <= max
+                            ) {
+                                this.result.push(item);
+                            }
+                        }
+                    });
+                    updateSquareRange(this.result, this.area);
+                    setNewValue(this.$refs.slider_area, this.area);
+                    updateFloorRange(this.result, this.floor);
+                    setNewValue(this.$refs.slider_floor, this.floor);
+                    this.updateInputsHidden();
+                    this.checkFilteredData();
+                    this.setValuesForFlatsToShow();
+                    console.log(this.result.length);
+                }
             });
             this.$refs.slider_area.noUiSlider.on("change", (e) => {
-                this.filtered_rooms = [];
-                let min = Math.round(e[0]);
-                let max = Math.round(e[1]);
-                this.dataList.map((item, i) => {
-                    if (item.field_status == "В продаже") {
-                        if (
-                            +item.field_square >= min &&
-                            +item.field_square <= max
-                        ) {
-                            this.filtered_rooms.push(item);
+                if (
+                    this.result.length == 0 &&
+                    !this.resultState &&
+                    !this.validStatus
+                ) {
+                    this.filtered_rooms = [];
+                    let min = Math.round(e[0]);
+                    let max = Math.round(e[1]);
+                    this.newListRoom.filter((item, i) => {
+                        if (item.field_status == "В продаже") {
+                            if (
+                                +item.field_square >= min &&
+                                +item.field_square <= max
+                            ) {
+                                this.filtered_rooms.push(item);
+                            }
                         }
-                    }
-                });
-                updateRoomRange(this.filtered_rooms, this.slider);
-                setNewValue(this.$refs.slider_room, this.slider);
-                updateFloorRange(this.filtered_rooms, this.floor);
-                setNewValue(this.$refs.slider_floor, this.floor);
+                    });
+                    updateRoomRange(this.filtered_rooms, this.slider);
+                    setNewValue(this.$refs.slider_room, this.slider);
+                    updateFloorRange(this.filtered_rooms, this.floor);
+                    setNewValue(this.$refs.slider_floor, this.floor);
+                    this.updateInputsHidden();
+                    this.checkFilteredData();
+                    this.setValuesForFlatsToShow();
+                } else {
+                    this.result = [];
+                    let min = Math.round(e[0]);
+                    let max = Math.round(e[1]);
+                    this.newListRoom.filter((item, i) => {
+                        if (item.field_status == "В продаже") {
+                            if (
+                                +item.field_square >= min &&
+                                +item.field_square <= max
+                            ) {
+                                this.result.push(item);
+                            }
+                        }
+                    });
+                    updateRoomRange(this.result, this.slider);
+                    setNewValue(this.$refs.slider_room, this.slider);
+                    updateFloorRange(this.result, this.floor);
+                    setNewValue(this.$refs.slider_floor, this.floor);
+                    this.updateInputsHidden();
+                    this.checkFilteredData();
+                    this.setValuesForFlatsToShow();
+                }
             });
             this.$refs.slider_floor.noUiSlider.on("change", (e) => {
-                this.filtered_rooms = [];
-                let min = Math.round(e[0]);
-                let max = Math.round(e[1]);
-                this.dataList.map((item, i) => {
-                    if (item.field_status == "В продаже") {
-                        if (
-                            +item.field_floor_1 >= min &&
-                            +item.field_floor_1 <= max
-                        ) {
-                            this.filtered_rooms.push(item);
+                if (
+                    this.result.length == 0 &&
+                    !this.resultState &&
+                    !this.validStatus
+                ) {
+                    this.filtered_rooms = [];
+                    let min = Math.round(e[0]);
+                    let max = Math.round(e[1]);
+                    this.newListRoom.filter((item, i) => {
+                        if (item.field_status == "В продаже") {
+                            if (
+                                +item.field_floor_1 >= min &&
+                                +item.field_floor_1 <= max
+                            ) {
+                                this.filtered_rooms.push(item);
+                            }
                         }
-                    }
-                });
-                updateRoomRange(this.filtered_rooms, this.slider);
-                setNewValue(this.$refs.slider_room, this.slider);
-                updateSquareRange(this.filtered_rooms, this.area);
-                setNewValue(this.$refs.slider_area, this.area);
+                    });
+                    updateRoomRange(this.filtered_rooms, this.slider);
+                    setNewValue(this.$refs.slider_room, this.slider);
+                    updateSquareRange(this.filtered_rooms, this.area);
+                    setNewValue(this.$refs.slider_area, this.area);
+                    this.updateInputsHidden();
+                    this.checkFilteredData();
+                    this.setValuesForFlatsToShow();
+                } else {
+                    this.result = [];
+                    let min = Math.round(e[0]);
+                    let max = Math.round(e[1]);
+                    this.newListRoom.filter((item, i) => {
+                        if (item.field_status == "В продаже") {
+                            if (
+                                +item.field_floor_1 >= min &&
+                                +item.field_floor_1 <= max
+                            ) {
+                                this.result.push(item);
+                            }
+                        }
+                    });
+                    updateRoomRange(this.result, this.slider);
+                    setNewValue(this.$refs.slider_room, this.slider);
+                    updateSquareRange(this.result, this.area);
+                    setNewValue(this.$refs.slider_area, this.area);
+                    this.updateInputsHidden();
+                    this.checkFilteredData();
+                    this.setValuesForFlatsToShow();
+                }
             });
+        },
+        checkFilteredData() {
+            if (
+                this.result.length == 0 &&
+                !this.resultState &&
+                !this.validStatus
+            ) {
+                if (this.filtered_rooms.length > 0) {
+                    return true;
+                } else {
+                    [...this.refsCheckboxes].forEach((checkbox) => {
+                        {
+                            checkbox.checked = false;
+                            this.selectedRooms = [];
+                        }
+                    });
+                }
+            } else {
+                if (this.result.length > 0) {
+                    return true;
+                } else {
+                    [...this.refsCheckboxes].forEach((checkbox) => {
+                        {
+                            checkbox.checked = false;
+                            this.selectedRooms = [];
+                        }
+                    });
+                }
+            }
         },
         updateFlatList(target) {
             this.newListRoom.filter((f) => {
@@ -172,6 +348,7 @@ export default {
                     f.field_status == "В продаже"
                 ) {
                     if (target.checked) {
+                        // this.filtered_rooms.push(f);
                         this.arrPrices.push({
                             id: f.field_number,
                             price: f.field_price,
@@ -227,6 +404,27 @@ export default {
                 this.selectedRooms
             );
             this.setNewSliderValues();
+            this.updateInputsHidden();
+        },
+        updateNewValuesSlider() {
+            this.$refs.slider_room.noUiSlider.on("update", (e) => {
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.slider.newMinValue = min;
+                this.slider.newMaxValue = max;
+            });
+            this.$refs.slider_area.noUiSlider.on("update", (e) => {
+                let min = e[0];
+                let max = e[1];
+                this.area.newMinValue = min;
+                this.area.newMaxValue = max;
+            });
+            this.$refs.slider_floor.noUiSlider.on("update", (e) => {
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.floor.newMinValue = min;
+                this.floor.newMaxValue = max;
+            });
         },
         // Проставление значений в слайдеры после того, как их обновили
         setNewSliderValues() {
@@ -255,6 +453,23 @@ export default {
                 maxValueFloor,
             ]);
         },
+        updateInputsHidden() {
+            this.$refs.slider_room.noUiSlider.on("update", (e) => {
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.hiddenInputs.price = `${min}_${max}`;
+            });
+            this.$refs.slider_area.noUiSlider.on("update", (e) => {
+                let min = e[0];
+                let max = e[1];
+                this.hiddenInputs.area = `${min}_${max}`;
+            });
+            this.$refs.slider_floor.noUiSlider.on("update", (e) => {
+                let min = Math.round(e[0]);
+                let max = Math.round(e[1]);
+                this.hiddenInputs.floor = `${min}_${max}`;
+            });
+        },
         openFilter() {
             this.isActive = true;
         },
@@ -264,6 +479,77 @@ export default {
         resetFilter() {
             window.location.reload();
         },
+        setValuesForFlatsToShow() {
+            if (
+                this.result.length == 0 &&
+                !this.validStatus &&
+                !this.resultState
+            ) {
+                if (this.filtered_rooms.length < 12) {
+                    this.flatsToShow = this.filtered_rooms.length;
+                } else {
+                    this.flatsToShow = 12;
+                }
+            } else {
+                if (this.result.length < 12) {
+                    this.flatsToShow = this.result.length;
+                } else {
+                    this.flatsToShow = 12;
+                }
+            }
+        },
+        loadMore() {
+            this.pageNumber++;
+            // let url = "https://jsonplaceholder.org/users/";
+            // try {
+            //     fetch(`${url}${this.pageNumber}`)
+            //         .then((response) => {
+            //             if (!response.ok) {
+            //                 throw new Error("Network response was not ok");
+            //             }
+            //             return response.json();
+            //         })
+            //         .then((flats) => {
+            //             // this.dataList = flats;
+            //             console.log(flats);
+            //         });
+            // } catch (err) {
+            //     console.error(
+            //         "There was a problem with the fetch operation:",
+            //         err
+            //     );
+            // }
+            if (this.result.length == 0) {
+                if (this.flatsToShow >= this.filtered_rooms.length) return;
+                // Разница
+                let diff = this.filtered_rooms.length - this.flatsToShow;
+                if (
+                    this.filtered_rooms.length > 12 &&
+                    this.filtered_rooms.length < 24
+                ) {
+                    this.newShow = this.filtered_rooms.length - 12;
+                    this.flatsToShow += this.newShow;
+                } else if (this.filtered_rooms.length > 24 && diff < 12) {
+                    this.flatsToShow += diff;
+                } else {
+                    this.flatsToShow += 12;
+                }
+            }
+            if (this.result.length > 0) {
+                console.log(this.result.length);
+                if (this.flatsToShow >= this.result.length) return;
+                // Разница
+                let diff = this.result.length - this.flatsToShow;
+                if (this.result.length > 12 && this.result.length < 24) {
+                    this.newShow = this.result.length - 12;
+                    this.flatsToShow += this.newShow;
+                } else if (this.result.length > 24 && diff < 12) {
+                    this.flatsToShow += diff;
+                } else {
+                    this.flatsToShow += 12;
+                }
+            }
+        },
     },
     mounted() {
         // Инициализация слайдеров
@@ -272,8 +558,13 @@ export default {
         initRange(this.$refs.slider_floor, this.floor);
         this.updateSlider();
         this.setNewArray();
+        this.updateInputsHidden();
         document.body.classList.add("not-front");
+        this.totalFlats = this.filtered_rooms.length;
+        this.selectedRooms = [];
+        // console.log(this.flatsToShow);
     },
+    beforeMount() {},
 };
 </script>
 <template>
@@ -300,12 +591,17 @@ export default {
                             <form action="#">
                                 <div class="main-sale__filter-top">
                                     <FieldRooms
-                                        @updateCheckboxes="
-                                            updateCheckboxes
+                                        @updateCheckboxes="updateCheckboxes"
+                                        @getArrCheckboxes="
+                                            getArrCheckboxes
                                         "></FieldRooms>
                                     <fieldset class="main-sale__filter-price">
                                         <legend>Количество комнат</legend>
                                         <div class="filter-slider">
+                                            <input
+                                                type="hidden"
+                                                name="field_price"
+                                                :value="hiddenInputs.price" />
                                             <div class="filter-slider-top">
                                                 <span class="filter-slider-from"
                                                     >от
@@ -333,6 +629,10 @@ export default {
                                     <fieldset class="main-sale__filter-floor">
                                         <legend>Этаж</legend>
                                         <div class="filter-slider">
+                                            <input
+                                                type="hidden"
+                                                name="field_floor__field_number"
+                                                :value="hiddenInputs.floor" />
                                             <div class="filter-slider-top">
                                                 <span class="filter-slider-from"
                                                     >от<span
@@ -359,6 +659,10 @@ export default {
                                     <fieldset class="main-sale__filter-area">
                                         <legend>Площадь квартиры (м²)</legend>
                                         <div class="filter-slider">
+                                            <input
+                                                type="hidden"
+                                                name="field_square"
+                                                :value="hiddenInputs.area" />
                                             <div class="filter-slider-top">
                                                 <span class="filter-slider-from"
                                                     >от
@@ -430,8 +734,194 @@ export default {
                 </div>
             </div>
             <div class="container">
-                <FlatListItem :list="dataList"></FlatListItem>
-                <button class="main-sale__show-more">показать ещё</button>
+                <div v-if="resultState && validStatus">
+                    <ul
+                        class="main-sale__list"
+                        :data-page="pageNumber"
+                        v-if="result.length > 0">
+                        <li
+                            class="main-sale__item"
+                            v-for="(flat, index) in flatsToShow"
+                            :key="index">
+                            <a
+                                href="flat-item.html"
+                                :data-id="result[index]?.field_number">
+                                <div class="main-sale__item-img">
+                                    <div class="swiper-wrapper">
+                                        <div class="swiper-slide img-flat">
+                                            <picture
+                                                ><source
+                                                    :srcset="
+                                                        result[index]
+                                                            ?.field_plan_image
+                                                    "
+                                                    type="image/webp" />
+                                                <img
+                                                    :src="
+                                                        result[index]
+                                                            ?.field_plan_image
+                                                    "
+                                                    :alt="result[index]?.title"
+                                            /></picture>
+                                        </div>
+                                        <div class="swiper-slide img-location">
+                                            <picture
+                                                ><source
+                                                    srcset="
+                                                        img/index/1-k-scheme.webp
+                                                    "
+                                                    type="image/webp" />
+                                                <img
+                                                    src="./img/index/1-k-scheme.png"
+                                                    alt=""
+                                            /></picture>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="main-sale__item-content">
+                                    <div class="main-sale__item-title">
+                                        <!-- {{ dataList[index].title }} -->
+                                        {{
+                                            result[index]?.field_rooms_count
+                                        }}-комнатная квартира
+                                        {{ result[index]?.field_square }}
+                                        м²
+                                    </div>
+                                    <div class="main-sale__item-text">
+                                        <span>
+                                            {{
+                                                Number(
+                                                    result[index]?.field_price
+                                                ).toLocaleString("ru-RU")
+                                            }}
+                                            руб.</span
+                                        >
+                                        <span
+                                            >{{
+                                                result[index]?.field_floor_1
+                                            }}
+                                            этаж</span
+                                        >
+                                    </div>
+                                    <div class="main-sale__item-link btn-arrow">
+                                        подробнее
+                                    </div>
+                                </div>
+                                <!-- <div class="main-sale__item-schild">
+                                    <span>французский балкон</span>
+                                </div> -->
+                            </a>
+                        </li>
+                    </ul>
+                    <div v-else>По вашему запросу ничего не найдено</div>
+                    <button
+                        v-if="
+                            flatsToShow < result.length ||
+                            result.length > flatsToShow
+                        "
+                        @click="loadMore()"
+                        class="main-sale__show-more">
+                        показать ещё
+                    </button>
+                </div>
+                <div v-else>
+                    <ul
+                        class="main-sale__list"
+                        :data-page="pageNumber"
+                        v-if="filtered_rooms.length > 0">
+                        <li
+                            class="main-sale__item"
+                            v-for="(flat, index) in flatsToShow"
+                            :key="index">
+                            <a
+                                href="flat-item.html"
+                                :data-id="filtered_rooms[index]?.field_number">
+                                <div class="main-sale__item-img">
+                                    <div class="swiper-wrapper">
+                                        <div class="swiper-slide img-flat">
+                                            <picture
+                                                ><source
+                                                    :srcset="
+                                                        filtered_rooms[index]
+                                                            ?.field_plan_image
+                                                    "
+                                                    type="image/webp" />
+                                                <img
+                                                    :src="
+                                                        filtered_rooms[index]
+                                                            ?.field_plan_image
+                                                    "
+                                                    :alt="
+                                                        filtered_rooms[index]
+                                                            ?.title
+                                                    "
+                                            /></picture>
+                                        </div>
+                                        <div class="swiper-slide img-location">
+                                            <picture
+                                                ><source
+                                                    srcset="
+                                                        img/index/1-k-scheme.webp
+                                                    "
+                                                    type="image/webp" />
+                                                <img
+                                                    src="./img/index/1-k-scheme.png"
+                                                    alt=""
+                                            /></picture>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="main-sale__item-content">
+                                    <div class="main-sale__item-title">
+                                        <!-- {{ dataList[index].title }} -->
+                                        {{
+                                            filtered_rooms[index]
+                                                ?.field_rooms_count
+                                        }}-комнатная квартира
+                                        {{
+                                            filtered_rooms[index]?.field_square
+                                        }}
+                                        м²
+                                    </div>
+                                    <div class="main-sale__item-text">
+                                        <span>
+                                            {{
+                                                Number(
+                                                    filtered_rooms[index]
+                                                        ?.field_price
+                                                ).toLocaleString("ru-RU")
+                                            }}
+                                            руб.</span
+                                        >
+                                        <span
+                                            >{{
+                                                filtered_rooms[index]
+                                                    ?.field_floor_1
+                                            }}
+                                            этаж</span
+                                        >
+                                    </div>
+                                    <div class="main-sale__item-link btn-arrow">
+                                        подробнее
+                                    </div>
+                                </div>
+                                <!-- <div class="main-sale__item-schild">
+                                    <span>французский балкон</span>
+                                </div> -->
+                            </a>
+                        </li>
+                    </ul>
+                    <div v-else>По вашему запросу ничего не найдено</div>
+                    <button
+                        v-if="
+                            flatsToShow < filtered_rooms.length ||
+                            filtered_rooms.length > flatsToShow
+                        "
+                        @click="loadMore()"
+                        class="main-sale__show-more">
+                        показать ещё
+                    </button>
+                </div>
             </div>
         </div>
     </div>
