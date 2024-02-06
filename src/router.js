@@ -10,19 +10,21 @@ const routes = [
     {
         path: "/scheme",
         alias: "/",
+        // name: "scheme",
         component: RoomScheme,
     },
     {
         path: "/list",
         alias: "/",
+        // name: "list",
         component: RoomList,
     },
 ];
 const router = createRouter({
+    history: createWebHistory(),
     routes,
-    history: createWebHistory(import.meta.env.BASE_URL),
-    scrollBehavior(to, from, savedPostition) {
-        return { top: 0 };
-    },
+    // scrollBehavior(to, from, savedPostition) {
+    //     return { top: 0 };
+    // },
 });
 export default router;

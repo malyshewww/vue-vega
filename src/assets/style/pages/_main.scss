@@ -2530,7 +2530,7 @@
         z-index: 2;
     }
 }
-.btn {
+.main-sale__btns .btn {
     background: transparent;
     border: 1px solid #c9d5e6;
     color: #505f7d;
@@ -2542,10 +2542,10 @@
         background-color: #505f7d;
     }
 }
-.main-sale__btn-list.btn::before {
+.main-sale__btns .btn::before {
     background-color: #505f7d;
 }
-.router-link-active {
+.main-sale__btns .router-link-active {
     background: #505f7d;
     color: white;
     &.btn {

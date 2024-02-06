@@ -4,7 +4,7 @@ import axios from "axios";
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import json from "../data.json";
-import FlatItem from "./FlatSchemeItem.vue";
+import FlatSchemeItem from "./FlatSchemeItem.vue";
 import NavigationBtn from "./NavigationBtn.vue";
 import FieldRooms from "./FieldRooms.vue";
 import { useFetch } from "../fetch.js";
@@ -22,7 +22,7 @@ import {
 export default {
     components: {
         noUiSlider,
-        FlatItem,
+        FlatSchemeItem,
         NavigationBtn,
         FieldRooms,
         Fancybox,
@@ -110,17 +110,37 @@ export default {
             )} руб.`;
             // this.tooltip.status =
             //     flat.status === "on-sale" ? "в продаже" : "забронирована";
-            if (document.body.clientWidth > 1199) {
-                let left = target.getBoundingClientRect().left;
-                let top = target.getBoundingClientRect().top;
-                this.$refs.tooltip.style.left = `${left}px`;
-                this.$refs.tooltip.style.top = `${top}px`;
-                this.$refs.tooltip.style.transform = `translate(-43%, -110%)`;
-            }
+            let left = target.getBoundingClientRect().left;
+            let top = target.getBoundingClientRect().top;
+            this.$refs.tooltip.style.left = `${left}px`;
+            this.$refs.tooltip.style.top = `${top}px`;
+            this.$refs.tooltip.style.transform = `translate(-43%, -110%)`;
             this.tooltip.isActive = !this.isActive;
         },
         closeTooltip() {
             this.tooltip.isActive = false;
+        },
+        openTooltipMobile(event, flat) {
+            event.preventDefault();
+            this.tooltip.img = flat.field_plan_image;
+            this.tooltip.title = `${flat.field_rooms_count}-комнатная, ${flat.field_square} м²`;
+            this.tooltip.price = `${Number(flat.field_price).toLocaleString(
+                "ru-RU"
+            )} руб.`;
+            this.tooltip.img = flat.field_plan_image;
+            this.tooltip.isActive = !this.isActive;
+        },
+        closeTooltipMobile(event) {
+            let target = event.target;
+            if (document.body.clientWidth < 1100) {
+                if (
+                    target.classList.contains("flat-list__window") ||
+                    target.classList.contains("mob-close") ||
+                    target.classList.contains("mob-close2")
+                ) {
+                    this.tooltip.isActive = false;
+                }
+            }
         },
         openFilter() {
             this.isActive = true;
@@ -397,7 +417,7 @@ export default {
         this.updateSlider();
         this.getPartArray();
         this.updateInputsHidden();
-        document.body.classList.add("not-front");
+        document.body.classList.add("not-front", "v2");
         console.log(this.newListRoom);
         const { data, error } = useFetch(() => console.log("fetch"));
         // console.log(data, error);
@@ -437,13 +457,14 @@ export default {
                                     {{ idx + 2 }}
                                 </div>
                                 <div class="flat-list__rooms">
-                                    <FlatItem
+                                    <FlatSchemeItem
                                         v-for="(item, index) in el"
                                         :item="item"
                                         :key="item.field_number"
                                         :selectedRooms="selectedRooms"
                                         @openTooltip="openTooltip"
                                         @closeTooltip="closeTooltip"
+                                        @openTooltipMobile="openTooltipMobile"
                                         :sliderMinValue="slider.newMinValue"
                                         :sliderMaxValue="slider.newMaxValue"
                                         :areaMinValue="area.newMinValue"
@@ -453,12 +474,12 @@ export default {
                                 <div class="flat-list__plan">
                                     <a
                                         class="flat-list__link"
-                                        href="./src/assets/img/flat/img2.png"
+                                        :href="el[0].floor_image"
                                         :data-fancybox="`gallery-${idx}`">
                                         план этажа
                                         <img
                                             style="display: none"
-                                            src="./src/assets/img/flat/img2.png"
+                                            :src="el[0].floor_image"
                                             alt="" />
                                     </a>
                                 </div>
@@ -641,14 +662,13 @@ export default {
         <div
             class="flat-list__window"
             ref="tooltip"
-            :class="{ active: tooltip.isActive }">
+            :class="{ active: tooltip.isActive }"
+            @click="closeTooltipMobile($event)">
             <div class="wrap">
                 <div class="flat-list__minImg">
                     <picture>
-                        <source
-                            :srcset="`${tooltip.img}.webp`"
-                            type="image/webp" />
-                        <img :src="`${tooltip.img}.png`" alt="" />
+                        <source :srcset="`${tooltip.img}`" />
+                        <img :src="`${tooltip.img}`" alt="" />
                     </picture>
                 </div>
                 <div class="flat-list__info">

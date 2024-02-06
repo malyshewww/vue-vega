@@ -1,10 +1,6 @@
 <script>
 export default {
-    methods: {
-        // checkRoutePath() {
-        //     if (this.$route.path == "/list")
-        // }
-    },
+    methods: {},
 };
 </script>
 <template>

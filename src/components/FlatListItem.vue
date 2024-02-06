@@ -19,7 +19,7 @@ export default {
 </script>
 <template>
     <li class="main-sale__item" v-for="(flat, index) in flatsToShow">
-        <a href="flat-item.html">
+        <a :href="`/${flat.field_number}`">
             <div class="main-sale__item-img">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide img-flat">
@@ -32,14 +32,14 @@ export default {
                                 :alt="list[index].title"
                         /></picture>
                     </div>
-                    <div class="swiper-slide img-location">
+                    <!-- <div class="swiper-slide img-location">
                         <picture
                             ><source
-                                srcset="img/index/1-k-scheme.webp"
+                                srcset="./img/index/1-k-scheme.png"
                                 type="image/webp" />
                             <img src="./img/index/1-k-scheme.png" alt=""
                         /></picture>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="main-sale__item-content">

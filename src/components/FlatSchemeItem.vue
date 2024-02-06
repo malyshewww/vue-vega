@@ -22,13 +22,18 @@ export default {
     },
     methods: {
         mouseEnterFlat(event, flatItem, floorItem) {
-            if (document.body.clientWidth > 1199) {
+            if (document.body.clientWidth > 1100) {
                 this.$emit("openTooltip", event, flatItem);
             }
         },
         mouseLeaveFlat() {
-            if (document.body.clientWidth > 1199) {
+            if (document.body.clientWidth > 1100) {
                 this.$emit("closeTooltip");
+            }
+        },
+        clickFlat(event, flatItem) {
+            if (document.body.clientWidth < 1100) {
+                this.$emit("openTooltipMobile", event, flatItem);
             }
         },
     },
@@ -89,16 +94,33 @@ export default {
 </script>
 <template>
     <a
+        :data-area="item.field_square"
+        :data-price="item.field_price"
+        :data-img="item.field_plan_image"
         ref="schemeItem"
         class="flat-list__room"
         :class="[
             addClass ? addClass : '',
             setBlockedClass ? setBlockedClass : '',
         ]"
-        :href="`./flats/${item.field_number}`"
+        :href="`/flats/${item.field_number}`"
         @mouseenter="mouseEnterFlat($event, item)"
-        @mouseleave="mouseLeaveFlat()">
+        @mouseleave="mouseLeaveFlat()"
+        @click="clickFlat($event, item)">
         {{ item.newRoom }}
     </a>
+    <!-- <a
+        :data-area="item.field_square"
+        :data-price="item.field_price"
+        :data-img="item.field_plan_image"
+        ref="schemeItem"
+        class="flat-list__room"
+        :class="[
+            addClass ? addClass : '',
+            setBlockedClass ? setBlockedClass : '',
+        ]"
+        :href="`./flats/${item.field_number}`">
+        {{ item.newRoom }}
+    </a> -->
 </template>
 <style></style>

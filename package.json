@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "@fancyapps/ui": "^5.0.33",
+        "autoprefixer": "^10.4.17",
         "vue": "^3.3.4",
         "vue-lazyload": "^3.0.0",
         "vue-router": "^4.2.5",
@@ -22,5 +23,10 @@
         "sass-loader": "^13.3.2",
         "vite": "^4.5.0",
         "vue3-nouislider": "^1.0.0"
-    }
+    },
+    "browserslist": [
+        "last 1 version",
+        "> 1%",
+        "not dead"
+    ]
 }

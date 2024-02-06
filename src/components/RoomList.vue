@@ -560,6 +560,7 @@ export default {
         this.setNewArray();
         this.updateInputsHidden();
         document.body.classList.add("not-front");
+        document.body.classList.remove("v2");
         this.totalFlats = this.filtered_rooms.length;
         this.selectedRooms = [];
         // console.log(this.flatsToShow);
@@ -744,7 +745,7 @@ export default {
                             v-for="(flat, index) in flatsToShow"
                             :key="index">
                             <a
-                                href="flat-item.html"
+                                :href="`/flats/${result[index]?.field_number}`"
                                 :data-id="result[index]?.field_number">
                                 <div class="main-sale__item-img">
                                     <div class="swiper-wrapper">
@@ -767,12 +768,16 @@ export default {
                                         <div class="swiper-slide img-location">
                                             <picture
                                                 ><source
-                                                    srcset="
-                                                        img/index/1-k-scheme.webp
+                                                    :srcset="
+                                                        result[index]
+                                                            ?.location_on_floor
                                                     "
                                                     type="image/webp" />
                                                 <img
-                                                    src="./img/index/1-k-scheme.png"
+                                                    :src="
+                                                        result[index]
+                                                            ?.location_on_floor
+                                                    "
                                                     alt=""
                                             /></picture>
                                         </div>
@@ -834,7 +839,7 @@ export default {
                             v-for="(flat, index) in flatsToShow"
                             :key="index">
                             <a
-                                href="flat-item.html"
+                                :href="`/flats/${filtered_rooms[index]?.field_number}`"
                                 :data-id="filtered_rooms[index]?.field_number">
                                 <div class="main-sale__item-img">
                                     <div class="swiper-wrapper">
@@ -860,12 +865,16 @@ export default {
                                         <div class="swiper-slide img-location">
                                             <picture
                                                 ><source
-                                                    srcset="
-                                                        img/index/1-k-scheme.webp
+                                                    :srcset="
+                                                        filtered_rooms[index]
+                                                            ?.location_on_floor
                                                     "
                                                     type="image/webp" />
                                                 <img
-                                                    src="./img/index/1-k-scheme.png"
+                                                    :src="
+                                                        filtered_rooms[index]
+                                                            ?.location_on_floor
+                                                    "
                                                     alt=""
                                             /></picture>
                                         </div>
