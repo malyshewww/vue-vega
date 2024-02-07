@@ -91,6 +91,7 @@ export default {
                 title: "",
                 price: "",
                 status: "",
+                href: "",
             },
             hiddenInputs: {
                 price: "",
@@ -128,6 +129,7 @@ export default {
                 "ru-RU"
             )} руб.`;
             this.tooltip.img = flat.field_plan_image;
+            this.tooltip.href = event.target.href;
             this.tooltip.isActive = !this.isActive;
         },
         closeTooltipMobile(event) {
@@ -675,7 +677,7 @@ export default {
                     <span class="inf">{{ tooltip.title }} </span>
                     <span class="price">{{ tooltip.price }} </span>
                 </div>
-                <a class="mob-btn btn" href="#">подробнее</a
+                <a class="mob-btn btn" :href="tooltip.href">подробнее</a
                 ><svg
                     width="8"
                     height="5"
