@@ -25,7 +25,7 @@ export default {
         FlatSchemeItem,
         NavigationBtn,
         FieldRooms,
-        Fancybox,
+        // Fancybox,
     },
     data() {
         return {
@@ -433,7 +433,7 @@ export default {
     //     }
     // },
     beforeMount() {
-        Fancybox.bind("[data-fancybox^='gallery']", {});
+        // Fancybox.bind("[data-fancybox^='gallery']", {});
     },
 };
 </script>
@@ -635,7 +635,7 @@ export default {
                                     </form>
                                 </div>
                                 <div class="main-sale__filter-submit">
-                                    <div class="btn">
+                                    <div class="btn" @click="closeFilter()">
                                         посмотреть предложения
                                     </div>
                                 </div>

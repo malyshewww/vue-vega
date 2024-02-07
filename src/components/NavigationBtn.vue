@@ -8,7 +8,7 @@ export default {
         <router-link
             class="main-sale__btn-scheme btn"
             :active-class="'router-link-active'"
-            to="/scheme">
+            to="/">
             <span>на схеме</span>
         </router-link>
         <router-link

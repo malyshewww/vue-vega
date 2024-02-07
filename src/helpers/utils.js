@@ -11,6 +11,12 @@ export function initRange(element, { ...obj }) {
         },
     });
 }
+export function initSwiper(elements) {
+    let flatSwiper;
+    elements.forEach((el) => {
+        flatSwiper = new Swiper(el, {});
+    });
+}
 export const checkboxObj = [
     {
         value: "1",

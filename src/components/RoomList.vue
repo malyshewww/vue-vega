@@ -3,6 +3,8 @@ import NavigationBtn from "./NavigationBtn.vue";
 import FieldRooms from "./FieldRooms.vue";
 import json from "../data.json";
 import FlatListItem from "./FlatListItem.vue";
+import Swiper from "swiper";
+import { ref, onMounted } from "vue";
 import {
     checkboxObj,
     initRange,
@@ -21,6 +23,7 @@ export default {
         NavigationBtn,
         FieldRooms,
         FlatListItem,
+        Swiper,
     },
     data() {
         return {
@@ -80,6 +83,9 @@ export default {
             result: [],
             resultState: false,
             validStatus: false,
+            setFlatSlider: [],
+            flatSlider: [],
+            itemRefs: [],
         };
     },
     methods: {
@@ -110,7 +116,7 @@ export default {
             });
             /*
             Доп. проверка для дальнейшего взаимодействия с переменной validStatus
-            Проверка, содержит ли свойство элементов массива newStatus значение true 
+            Проверка, содержит ли свойство элементов массива newStatus значение true
             */
             this.validStatus = this.result.every(function (x) {
                 return x.newStatus == true;
@@ -550,6 +556,11 @@ export default {
                 }
             }
         },
+        setItemRef(el) {
+            if (el) {
+                this.itemRefs.push(el);
+            }
+        },
     },
     mounted() {
         // Инициализация слайдеров
@@ -565,7 +576,17 @@ export default {
         this.selectedRooms = [];
         // console.log(this.flatsToShow);
     },
-    beforeMount() {},
+    beforeUpdate() {
+        this.itemRefs = [];
+    },
+    updated() {
+        if (this.itemRefs.length > 0 && window.screen.width < 1000) {
+            this.itemRefs.forEach((item) => {
+                const slider = item.querySelector(".swiper");
+                new Swiper(slider, {});
+            });
+        }
+    },
 };
 </script>
 <template>
@@ -729,7 +750,9 @@ export default {
                             </form>
                         </div>
                         <div class="main-sale__filter-submit">
-                            <div class="btn">посмотреть предложения</div>
+                            <div class="btn" @click="closeFilter()">
+                                посмотреть предложения
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -743,11 +766,12 @@ export default {
                         <li
                             class="main-sale__item"
                             v-for="(flat, index) in flatsToShow"
-                            :key="index">
+                            :key="index"
+                            :ref="setItemRef">
                             <a
                                 :href="`/flats/${result[index]?.field_number}`"
                                 :data-id="result[index]?.field_number">
-                                <div class="main-sale__item-img">
+                                <div class="main-sale__item-img swiper">
                                     <div class="swiper-wrapper">
                                         <div class="swiper-slide img-flat">
                                             <picture
@@ -837,11 +861,12 @@ export default {
                         <li
                             class="main-sale__item"
                             v-for="(flat, index) in flatsToShow"
-                            :key="index">
+                            :key="index"
+                            :ref="setItemRef">
                             <a
                                 :href="`/flats/${filtered_rooms[index]?.field_number}`"
                                 :data-id="filtered_rooms[index]?.field_number">
-                                <div class="main-sale__item-img">
+                                <div class="main-sale__item-img swiper">
                                     <div class="swiper-wrapper">
                                         <div class="swiper-slide img-flat">
                                             <picture

@@ -10,6 +10,7 @@
     "dependencies": {
         "@fancyapps/ui": "^5.0.33",
         "autoprefixer": "^10.4.17",
+        "swiper": "^8.0.7",
         "vue": "^3.3.4",
         "vue-lazyload": "^3.0.0",
         "vue-router": "^4.2.5",
