@@ -420,8 +420,8 @@ export default {
         this.getPartArray();
         this.updateInputsHidden();
         document.body.classList.add("not-front", "v2");
-        console.log(this.newListRoom);
-        const { data, error } = useFetch(() => console.log("fetch"));
+        // console.log(this.newListRoom);
+        // const { data, error } = useFetch(() => console.log("fetch"));
         // console.log(data, error);
     },
     // async created() {
@@ -508,7 +508,7 @@ export default {
                                     <h3 class="wrapper-title">Фильтр</h3>
                                 </div>
                                 <div class="main-sale__filter-form-wrap">
-                                    <form action="#">
+                                    <form data-once="form-updated">
                                         <div class="main-sale__filter-top">
                                             <FieldRooms
                                                 @updateCheckboxes="

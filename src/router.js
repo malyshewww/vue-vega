@@ -9,19 +9,17 @@ import RoomList from "./components/RoomList.vue";
 const routes = [
     {
         path: "/",
-        // alias: "/",
-        // name: "scheme",
+        name: "scheme",
         component: RoomScheme,
     },
     {
         path: "/list",
-        // alias: "/",
-        // name: "list",
+        name: "list",
         component: RoomList,
     },
 ];
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHashHistory(import.meta.env.BASE_URL),
     routes,
     // scrollBehavior(to, from, savedPostition) {
     //     return { top: 0 };

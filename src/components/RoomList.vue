@@ -108,15 +108,25 @@ export default {
                         tempStatus = false;
                     }
                 }
-                item.newStatus = tempStatus;
+                return (item.newStatus = tempStatus);
             });
+            /* ПРОБЛЕМНОЕ МЕСТО, где пришлось вводить новую переменную result,
+                чтобы скалдывать отфильтрованные результаты в него и дальше работать уже с этим массивом
+                К массиву filtered_rooms не получилось применить filter на лету, возвращает все 
+
+                Далее в template идет проверка с каким массивом мы работаем 
+                и получаем дублирование разметки с определенным функционалом 
+
+                Измененная реалзиация вывода карточек в шаблоне
+            */
+
             // Отбираем из массива только те объекты, у которых newStatus статус равен true
             this.result = this.filtered_rooms.filter((item) => {
                 return Boolean(item.newStatus);
             });
             /*
             Доп. проверка для дальнейшего взаимодействия с переменной validStatus
-            Проверка, содержит ли свойство элементов массива newStatus значение true
+            Проверка - содержит ли свойство элементов массива newStatus значение true
             */
             this.validStatus = this.result.every(function (x) {
                 return x.newStatus == true;
@@ -216,7 +226,6 @@ export default {
                     this.updateInputsHidden();
                     this.checkFilteredData();
                     this.setValuesForFlatsToShow();
-                    console.log(this.result.length);
                 }
             });
             this.$refs.slider_area.noUiSlider.on("change", (e) => {
@@ -459,6 +468,7 @@ export default {
                 maxValueFloor,
             ]);
         },
+        // Добавление значений в скрытые инпуты слайдеров
         updateInputsHidden() {
             this.$refs.slider_room.noUiSlider.on("update", (e) => {
                 let min = Math.round(e[0]);
@@ -525,7 +535,7 @@ export default {
             //         err
             //     );
             // }
-            if (this.result.length == 0) {
+            if (this.result.length === 0) {
                 if (this.flatsToShow >= this.filtered_rooms.length) return;
                 // Разница
                 let diff = this.filtered_rooms.length - this.flatsToShow;
@@ -583,14 +593,16 @@ export default {
         if (this.itemRefs.length > 0 && window.screen.width < 1000) {
             this.itemRefs.forEach((item) => {
                 const slider = item.querySelector(".swiper");
-                new Swiper(slider, {});
+                if (slider) {
+                    new Swiper(slider, {});
+                }
             });
         }
     },
 };
 </script>
 <template>
-    <div>
+    <div id="list">
         <div class="main-sale">
             <div class="main-sale__filter">
                 <div class="container">
@@ -610,7 +622,7 @@ export default {
                             <h3 class="wrapper-title">Фильтр</h3>
                         </div>
                         <div class="main-sale__filter-form-wrap">
-                            <form action="#">
+                            <form data-once="form-updated">
                                 <div class="main-sale__filter-top">
                                     <FieldRooms
                                         @updateCheckboxes="updateCheckboxes"
@@ -758,7 +770,20 @@ export default {
                 </div>
             </div>
             <div class="container">
-                <div v-if="resultState && validStatus">
+                <!-- Альтернативный вывод првеью квартир, сравнивая индексы -->
+                <!-- <div v-for="(flat, index) in flatsToShow" :key="index">
+                    <div
+                        v-for="(item, itemIndex) in filtered_rooms.filter(
+                            (item) => {
+                                return Boolean(item.newStatus);
+                            }
+                        )">
+                        <div v-if="index === itemIndex">
+                            {{ item.field_number }} - {{ itemIndex }}
+                        </div>
+                    </div>
+                </div> -->
+                <div v-if="validStatus && resultState">
                     <ul
                         class="main-sale__list"
                         :data-page="pageNumber"
